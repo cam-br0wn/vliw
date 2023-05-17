@@ -1,7 +1,9 @@
 module ixu_decode
 (
     input logic [31:0] inst,
+    input logic stall,
     output logic [4:0] op,
+    output logic is_nop,
     output logic is_imm_type
 );
 
@@ -18,13 +20,18 @@ assign funct7 = inst[31:25];
 
 // drive an output signal to be used on a mux between reg file and pipeline reg
 always_comb begin
+    if (stall == 1'b1 || inst == 32'h0) begin
+        is_nop = 1'b1;
     // R-type
-    if (opcode == 7'b0110011) begin
+    end else if (opcode == 7'b0110011) begin
         is_imm_type = 1'b0;
+        is_nop = 1'b0;
     // I-type
     end else if (opcode == 7'b0010011) begin
         is_imm_type = 1'b1;
-    // Neither (which is wrong)
+        is_nop = 1'b0;
+
+    // Neither and not a NOP (which is wrong)
     end else begin
         $error("ERROR: INVALID BITS IN OPCODE   !!");
         $quit;

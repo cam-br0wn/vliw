@@ -1,9 +1,9 @@
 module ixu_alu
 (
-    input [31:0] X,
-    input [31:0] Y,
-    input [3:0] op,
-    output [31:0] out
+    input logic [31:0] X,
+    input logic [31:0] Y,
+    input logic [3:0] op,
+    output logic [31:0] out
 );
 
 // necessary operations:

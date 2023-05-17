@@ -1,15 +1,16 @@
 module register_file (
   input  logic clk,
-  input  logic [2:0] rd_addr1,
-  input  logic [2:0] rd_addr2,
-  input  logic [2:0] wr_addr,
-  input  logic [31:0] wr_data,
-  input  logic wr_en,
-  output logic [31:0] rd_data1,
-  output logic [31:0] rd_data2
+  // need to give each execution pipe it's own ports
+  input  logic [4:0] lsu_rs1,
+  input  logic [4:0] lsu_rs2,
+  input  logic [4:0] lsu_wr_addr,
+  input  logic [31:0] lsu_wr_data,
+  input  logic        lsu_wr_en,
+  output logic [31:0] lsu_rd_data1,
+  output logic [31:0] lsu_rd_data2
 );
 
-  logic [31:0] regs [0:31];
+  logic [4:0] regs [0:31];
 
   always_ff @(posedge clk) begin
     if (wr_en) begin
