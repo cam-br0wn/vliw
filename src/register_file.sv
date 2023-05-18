@@ -1,13 +1,15 @@
 module register_file (
   input  logic clk,
   // need to give each execution pipe it's own ports
-  input  logic [4:0] lsu_rs1,
-  input  logic [4:0] lsu_rs2,
-  input  logic [4:0] lsu_wr_addr,
-  input  logic [31:0] lsu_wr_data,
-  input  logic        lsu_wr_en,
-  output logic [31:0] lsu_rd_data1,
-  output logic [31:0] lsu_rd_data2
+  // LSU ports
+  input   logic [4:0]   lsu_rs1,
+  input   logic [4:0]   lsu_rs2,
+  input   logic [4:0]   lsu_rd,
+  input   logic [4:0]   lsu_wr_addr,
+  input   logic [31:0]  lsu_wr_data,
+  input   logic         lsu_wr_en,
+  output  logic [31:0]  lsu_rd_data1,
+  output  logic [31:0]  lsu_rd_data2
 );
 
   logic [4:0] regs [0:31];

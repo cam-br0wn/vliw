@@ -4,6 +4,7 @@ module lsu_ex_wb
 (
     input   logic           clk,
     input   logic           rst,
+    input   logic           stall,
     input   logic           is_load_in,
     input   logic           zero_ext_in,
     input   logic           is_nop_in,
@@ -18,13 +19,20 @@ module lsu_ex_wb
 
 always_ff @(posedge clk or posedge rst) begin
 
-    if (rst) begin
+    if (rst == 1'b1) begin
         is_load_out <= '0;
         zero_ext_out <= '0;
         // TODO: check if issuing NOP on reset causes probs
         is_nop_out <= '1;
         size_out <= '0;
         rd_out <= '0;
+    end
+    else if (stall == 1'b1) begin
+        is_load_out <= is_load_out;
+        zero_ext_out <= zero_ext_out;
+        is_nop_out <= is_nop_out;
+        size_out <= size_out;
+        rd_out <= rd_out;
     end
     else begin
         is_load_out <= is_load_in;

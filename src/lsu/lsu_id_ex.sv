@@ -1,28 +1,29 @@
 module lsu_id_ex
 (
-    input logic clk,
-    input logic rst,
-    input logic is_load_in,
-    input logic zero_ext_in,
-    input logic is_nop_in,
-    input logic [1:0] size_in,
-    input logic [4:0] rs1_in,
-    input logic [4:0] rs2_in,
-    input logic [4:0] rd_in,
-    input logic [11:0] imm_in,
-    output logic is_load_out,
-    output logic zero_ext_out,
-    output logic is_nop_out,
-    output logic [1:0] size_out,
-    output logic [4:0] rs1_out,
-    output logic [4:0] rs2_out,
-    output logic [4:0] rd_out,
-    output logic [11:0] imm_out
+    input   logic           clk,
+    input   logic           rst,
+    input   logic           stall,
+    input   logic           is_load_in,
+    input   logic           zero_ext_in,
+    input   logic           is_nop_in,
+    input   logic [1:0]     size_in,
+    input   logic [4:0]     rs1_in,
+    input   logic [4:0]     rs2_in,
+    input   logic [4:0]     rd_in,
+    input   logic [11:0]    imm_in,
+    output  logic           is_load_out,
+    output  logic           zero_ext_out,
+    output  logic           is_nop_out,
+    output  logic [1:0]     size_out,
+    output  logic [4:0]     rs1_out,
+    output  logic [4:0]     rs2_out,
+    output  logic [4:0]     rd_out,
+    output  logic [11:0]    imm_out
 );
 
 always_ff @(posedge clk or posedge rst) begin
 
-    if (rst) begin
+    if (rst == 1'b1) begin
         is_load_out <= '0;
         zero_ext_out <= '0;
         size_out <= '0;
@@ -33,6 +34,17 @@ always_ff @(posedge clk or posedge rst) begin
         // TODO: check if issuing NOP on reset causes a problem
         // idea is that we don't want it to crash just because of a reset
         is_nop_out <= '1;
+    end
+    // if we are stalling just want to preserve the state
+    else if (stall == 1'b1) begin
+        is_load_out <= is_load_out;
+        zero_ext_out <= zero_ext_out;
+        size_out <= size_out;
+        rs1_out <= rs1_out;
+        rs2_out <= rs2_out;
+        rd_out <= rd_out;
+        imm_out <= imm_out;
+        is_nop_out <= is_nop_out;
     end
     else begin
         is_load_out <= is_load_in;

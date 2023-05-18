@@ -3,7 +3,6 @@
 module lsu_decode
 (
     input   logic [31:0]    inst,
-    input   logic           stall,
     output  logic           is_load,
     output  logic           zero_ext,
     output  logic           is_nop,
@@ -29,7 +28,7 @@ always_comb begin
     // don't really want default values...
     zero_ext = '0;
     // if it is a load
-    if (stall == 1'b0 && (funct7 == 7'b0000011 || funct7 == 7'b0100011)) begin
+    if (funct7 == 7'b0000011 || funct7 == 7'b0100011) begin
 
         // set rs1
         rs1 = inst[19:15];
@@ -65,7 +64,7 @@ always_comb begin
         // NOTE: we don't calculate the load/store address at this stage, that's done in execution stage
 
     // if it is a NOP, continue but don't float signals
-    end else if (inst == 32'h00000000 || stall == 1'b1) begin
+    end else if (inst == 32'h00000000) begin
         is_nop = 1'b1;
         is_load = '0;
         rs1 = '0;
