@@ -1,9 +1,10 @@
 module main_memory(
-  input wire clk,
-  input wire [7:0] addr,
-  input wire [7:0] data_in,
-  input wire write_en,
-  output reg [7:0] data_out
+  input logic clk,
+  input logic [31:0] wr_addr,
+  input logic [31:0] wr_data,
+  input logic        wr_en,
+  input logic [31:0] rd_addr,
+  output logic [31:0] data_out
 );
 
   // Define the memory array
@@ -11,7 +12,7 @@ module main_memory(
 
   // Write to the memory array when write_en is high
   always_ff @(posedge clk) begin
-    if (write_en) mem[addr] <= data_in;
+    if (wr_en) mem[addr] <= data_in;
   end
 
   // Read from the memory array

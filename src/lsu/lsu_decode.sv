@@ -2,23 +2,22 @@
 
 module lsu_decode
 (
-    input logic [31:0] inst,
-    input logic stall,
-    output logic is_load,
-    output logic zero_ext,
-    output logic is_nop,
-    output logic [1:0] size,
-    output logic [4:0] rs1,
-    output logic [4:0] rs2,
-    output logic [11:0] imm
+    input   logic [31:0]    inst,
+    input   logic           stall,
+    output  logic           is_load,
+    output  logic           zero_ext,
+    output  logic           is_nop,
+    output  logic [1:0]     size,
+    output  logic [4:0]     rs1,
+    output  logic [4:0]     rs2,
+    output  logic [4:0]     rd,
+    output  logic [11:0]    imm
 );
 
 // memory instructions include
 // LB, LH, LW, LBU, LHU
 // SB, SH, SW
 // LBU and LHU zero-extend the data
-
-// TODO: Implement stalling capability that issues a NOP
 
 logic [2:0] funct3;
 logic [6:0] funct7;
@@ -31,6 +30,9 @@ always_comb begin
     zero_ext = '0;
     // if it is a load
     if (stall == 1'b0 && (funct7 == 7'b0000011 || funct7 == 7'b0100011)) begin
+
+        // set rs1
+        rs1 = inst[19:15];
 
         // set is_nop to 0
         is_nop = 1'b0;
@@ -64,11 +66,16 @@ always_comb begin
 
     // if it is a NOP, continue but don't float signals
     end else if (inst == 32'h00000000 || stall == 1'b1) begin
-
         is_nop = 1'b1;
+        is_load = '0;
+        rs1 = '0;
+        rs2 = '0;
+        imm = '0;
+        zero_ext = '0;
+        size = '0;
 
     end else begin
-        $error("INVALID FUNCT7 BITS PROVIDED TO LSU DECODE");
+        $error("LSU DECODE: couldn't determine inst");
     end
 end
 

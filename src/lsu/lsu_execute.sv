@@ -1,20 +1,22 @@
 // execution stage for LSU
 // this module is designed to make memory accesses
 
+// The first pass at this module assumes 1 cycle of latency in memory access
+// Also assumes that register reads are combinational (no latency)
+// This is obviously unsustainable in a real implementation
+
 module lsu_execute
 (
-    input logic is_load,
-    input logic is_nop,
-    input logic [11:0] imm,
-    input logic [31:0] rs1_data,
-    input logic [31:0] rs2_data,
-    output logic [31:0] wr_addr,
-    output logic [31:0] wr_data,
-    output logic        wr_en,
-    output logic [31:0] rd_addr
+    input   logic           is_load,
+    input   logic           is_nop,
+    input   logic [11:0]    imm,
+    input   logic [31:0]    rs1_data,
+    input   logic [31:0]    rs2_data,
+    output  logic [31:0]    wr_addr,
+    output  logic [31:0]    wr_data,
+    output  logic           wr_en,
+    output  logic [31:0]    rd_addr
 );
-
-logic [31:0] rs1_plus_imm;
 
 always_comb begin
     // if LOAD
@@ -38,7 +40,7 @@ always_comb begin
         wr_data = '0;
         wr_en = '0;
     end else begin
-        $error("ERROR IN LSU EXECUTE STAGE");
+        $error("LSU EX: could not determine instruction type");
     end
 
 end
