@@ -1,10 +1,10 @@
 module main_memory(
-  input logic clk,
-  input logic [31:0] wr_addr,
-  input logic [31:0] wr_data,
-  input logic        wr_en,
-  input logic [31:0] rd_addr,
-  output logic [31:0] data_out
+  input   logic         clk,
+  input   logic [31:0]  wr_addr,
+  input   logic [31:0]  wr_data,
+  input   logic         wr_en,
+  input   logic [31:0]  rd_addr,
+  output  logic [31:0]  data_out
 );
 
   // Define the memory array

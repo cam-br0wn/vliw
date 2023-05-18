@@ -1,13 +1,14 @@
 module ixu_decode
 (
-    input logic [31:0] inst,
-    input logic stall,
-    output logic [4:0] op,
-    output logic is_nop,
-    output logic is_imm_type
+    input   logic [31:0]    inst,
+    output  logic [3:0]     op,
+    output  logic           is_nop,
+    output  logic           is_imm_type,
+    output  logic [4:0]     rs1,
+    output  logic [4:0]     rs2,
+    output  logic [4:0]     rd,
+    output  logic [11:0]    imm
 );
-
-// we need to access regs this cycle so data is ready next cycle
 
 // internal signals
 logic [6:0] opcode;
@@ -17,24 +18,31 @@ logic [6:0] funct7;
 assign opcode = inst[6:0];
 assign funct3 = inst[14:12];
 assign funct7 = inst[31:25];
+assign rs1 = inst[19:15];
+assign rd = inst[11:7];
 
 // drive an output signal to be used on a mux between reg file and pipeline reg
 always_comb begin
-    if (stall == 1'b1 || inst == 32'h0) begin
+    if (inst == 32'h0) begin
         is_nop = 1'b1;
+        rs2 = '0;
+        imm = '0;
     // R-type
     end else if (opcode == 7'b0110011) begin
         is_imm_type = 1'b0;
         is_nop = 1'b0;
+        rs2 = inst[24:20];
+        imm = '0;
     // I-type
     end else if (opcode == 7'b0010011) begin
         is_imm_type = 1'b1;
         is_nop = 1'b0;
+        rs2 = '0;
+        imm = inst[31:20];
 
     // Neither and not a NOP (which is wrong)
     end else begin
-        $error("ERROR: INVALID BITS IN OPCODE   !!");
-        $quit;
+        $error("IXU DECODE ERROR: invalid opcode");
     end
 end
 
