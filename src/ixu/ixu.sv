@@ -18,66 +18,90 @@ module ixu
     output  logic           reg_file_wr_en
 );
 
+// Decode -> ID/EX register internal signals
+logic [3:0]     decode_op;
+logic           decode_is_nop;
+logic           decode_is_imm_type;
+logic [4:0]     decode_rs1;
+logic [4:0]     decode_rs2;
+logic [4:0]     decode_rd;
+logic [11:0]    decode_imm;
+
 ixu_decode ixu_decode_instance (
     .inst(inst),
-    .op(),
-    .is_nop(),
-    .is_imm_type(),
-    .rs1(),
-    .rs2(),
-    .rd(),
-    .imm()
+    .op(decode_op),
+    .is_nop(decode_is_nop),
+    .is_imm_type(decode_is_imm_type),
+    .rs1(decode_rs1),
+    .rs2(decode_rs2),
+    .rd(decode_rd),
+    .imm(decode_imm)
 );
+
+// ID/EX -> Execution internal signals
+logic [3:0]     idex_op;
+logic           idex_is_nop;
+logic           idex_is_imm_type;
+logic [4:0]     idex_rd;
+logic [11:0]    idex_imm;
 
 ixu_id_ex ixu_id_ex_reg (
     .clk(clk),
     .rst(rst),
     .stall(stall),
-    .op_in(),
-    .is_nop_in(),
-    .is_imm_type_in(),
-    .rs1_in(),
-    .rs2_in(),
-    .rd_in(),
-    .imm_in(),
-    .op_out(),
-    .is_nop_out(),
-    .is_imm_type_out(),
-    .rs1_out(),
-    .rs2_out(),
-    .rd_out(),
-    .imm_out()
+    .op_in(decode_op),
+    .is_nop_in(decode_is_nop),
+    .is_imm_type_in(decode_is_imm_type),
+    .rs1_in(decode_rs1),
+    .rs2_in(decode_rs2),
+    .rd_in(decode_rd),
+    .imm_in(decode_imm),
+    .op_out(idex_op),
+    .is_nop_out(idex_is_nop),
+    .is_imm_type_out(idex_is_imm_type),
+    .rs1_out(rs1_out),
+    .rs2_out(rs2_out),
+    .rd_out(idex_rd),
+    .imm_out(idex_imm)
 );
 
+// execution stage internal signals
+logic [31:0]    execute_data;
+
 ixu_execute ixu_execute_instance (
-    .rs1_data(),
-    .rs2_data(),
-    .imm(),
-    .is_imm_type(),
-    .is_nop(),
-    .op(),
-    .out()
+    .rs1_data(rs1_data),
+    .rs2_data(rs2_data),
+    .imm(idex_imm),
+    .is_imm_type(idex_is_imm_type),
+    .is_nop(idex_is_nop),
+    .op(idex_op),
+    .out(execute_data)
 );
+
+// EX/WB -> writeback signals
+logic           exwb_is_nop;
+logic [4:0]     exwb_rd;
+logic [31:0]    exwb_data;
 
 ixu_ex_wb ixu_ex_wb_reg (
     .clk(clk),
     .rst(rst),
     .stall(stall),
-    .is_nop_in(),
-    .rd_in(),
-    .data_in(),
-    .is_nop_out(),
-    .rd_out(),
-    .data_out()
+    .is_nop_in(idex_is_nop),
+    .rd_in(idex_rd),
+    .data_in(execute_data),
+    .is_nop_out(exwb_is_nop),
+    .rd_out(exwb_rd),
+    .data_out(exwb_data)
 );
 
 ixu_writeback ixu_writeback_instance (
-    .is_nop(),
-    .rd(),
-    .data_in(),
-    .rd_out(),
-    .data_out(),
-    .wr_en()
+    .is_nop(exwb_is_nop),
+    .rd(exwb_rd),
+    .data_in(exwb_data),
+    .rd_out(rd_out),
+    .data_out(data_out),
+    .wr_en(reg_file_wr_en)
 );
 
 endmodule
