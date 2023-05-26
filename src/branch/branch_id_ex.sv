@@ -14,6 +14,7 @@ module branch_id_ex
     input   logic [4:0]     rs2_in,
     input   logic [4:0]     rd_in,
     input   logic [21:0]    imm_in,
+    input   logic [31:0]    pc_in,
     output  logic           is_nop_out,
     output  logic           is_jmp_out,
     output  logic           is_imm_type_out,
@@ -22,7 +23,8 @@ module branch_id_ex
     output  logic [4:0]     rs1_out,
     output  logic [4:0]     rs2_out,
     output  logic [4:0]     rd_out,
-    output  logic [21:0]    imm_out
+    output  logic [21:0]    imm_out,
+    output  logic [31:0]    pc_out
 );
 
 always_ff @(posedge clk or posedge rst) begin
