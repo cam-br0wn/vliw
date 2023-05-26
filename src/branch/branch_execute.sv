@@ -6,6 +6,10 @@ module branch_execute
     input   logic           zero_ext,
     input   logic           is_jmp,
     input   logic           is_imm_type,
+    input   logic           is_rs1_fwd,
+    input   logic           is_rs2_fwd,
+    input   logic [31:0]    rs1_fwd_data,
+    input   logic [31:0]    rs2_fwd_data,
     input   logic [31:0]    pc,
     input   logic [1:0]     op,
     input   logic [31:0]    rs1_data,
@@ -18,11 +22,17 @@ module branch_execute
 );
 
 logic [31:0] internal_imm;
+logic [31:0] internal_rs1_data;
+logic [31:0] internal_rs2_data;
 // if it's a JAL, only sign extend by 10 bits, otherwise sign extend by 20
 assign internal_imm = (is_jmp == '1 && is_imm_type == '0) ? {{10{imm[21]}}, imm} : {{20{imm[11]}}, imm};
 // if it's a JALR, put PC + 4 into rd
 assign ret_addr = $signed(pc) + $signed(32'h00000004);
 assign rd_wr_en = (is_jmp == '1 && is_imm_type == '1) ? '1 : '0;
+
+// if there is forwarding, do it
+assign internal_rs1_data = (is_rs1_fwd == 1'b1) ? rs1_fwd_data : rs1_data;
+assign internal_rs2_data = (is_rs2_fwd == 1'b1) ? rs2_fwd_data : rs2_data;
 
 always_comb begin
     if (is_nop == '0) begin
@@ -30,19 +40,19 @@ always_comb begin
         if (is_jmp == '0) begin
             // BEQ
             if (op == 2'h0) begin
-                branch_taken = (rs1_data == rs2_data) ? '1 : '0;
+                branch_taken = (internal_rs1_data == internal_rs2_data) ? '1 : '0;
                 new_pc = $signed(pc) + $signed(internal_imm);
             // BNE
             end else if (op == 2'h1) begin
-                branch_taken = (rs1_data == rs2_data) ? '0 : '1;
+                branch_taken = (internal_rs1_data == internal_rs2_data) ? '0 : '1;
                 new_pc = $signed(pc) + $signed(internal_imm);
             // BLT or BLTU
             end else if (op == 2'h2) begin
                 if (zero_ext == 1'b1) begin
-                    branch_taken = ($unsigned(rs1_data) < $unsigned(rs2_data)) ? '1 : '0;
+                    branch_taken = ($unsigned(internal_rs1_data) < $unsigned(internal_rs2_data)) ? '1 : '0;
                     new_pc = $signed(pc) + $signed(internal_imm);
                 end else if (zero_ext == 1'b0) begin
-                    branch_taken = ($signed(rs1_data) < $signed(rs2_data)) ? '1 : '0;
+                    branch_taken = ($signed(internal_rs1_data) < $signed(internal_rs2_data)) ? '1 : '0;
                     new_pc = $signed(pc) + $signed(internal_imm);
                 end else begin
                     $error("BRANCH EXEC ERROR: zero ext flag not set");
@@ -50,10 +60,10 @@ always_comb begin
             // BGE OR BGEU
             end else if (op == 2'h3) begin
                 if (zero_ext == 1'b1) begin
-                    branch_taken = ($unsigned(rs1_data) >= $unsigned(rs2_data)) ? '1 : '0;
+                    branch_taken = ($unsigned(internal_rs1_data) >= $unsigned(internal_rs2_data)) ? '1 : '0;
                     new_pc = $signed(pc) + $signed(internal_imm);
                 end else if (zero_ext == 1'b0) begin
-                    branch_taken = ($signed(rs1_data) >= $signed(rs2_data)) ? '1 : '0;
+                    branch_taken = ($signed(internal_rs1_data) >= $signed(internal_rs2_data)) ? '1 : '0;
                     new_pc = $signed(pc) + $signed(internal_imm);
                 end else begin
                     $error("BRANCH EXEC ERROR: zero ext flag not set");

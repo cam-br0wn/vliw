@@ -53,8 +53,6 @@ logic           idex_is_jmp;
 logic           idex_is_imm_type;
 logic           idex_zero_ext;
 logic [1:0]     idex_op;
-logic [4:0]     idex_rs1;
-logic [4:0]     idex_rs2;
 logic [21:0]    idex_imm;
 logic [31:0]    idex_pc;
 

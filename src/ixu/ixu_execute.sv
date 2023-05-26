@@ -2,6 +2,10 @@
 
 module ixu_execute
 (
+    input   logic           is_rs1_fwd,
+    input   logic           is_rs2_fwd,
+    input   logic [31:0]    rs1_fwd_data,
+    input   logic [31:0]    rs2_fwd_data,
     input   logic [31:0]    rs1_data,
     input   logic [31:0]    rs2_data,
     input   logic [11:0]    imm,
@@ -15,11 +19,17 @@ module ixu_execute
 // ADD, SUB, XOR, OR, AND, SLL, SRL, SRA, SLT, SLTU
 // ADDI, XORI, ORI, ANDI, SLLI, SRLI, SRAI
 
+logic [31:0] internal_rs1_data;
+logic [31:0] internal_rs2_data;
+
+assign internal_rs1_data = (is_rs1_fwd == 1'b1) ? rs1_fwd_data : rs1_data;
+assign internal_rs2_data = (is_rs2_fwd == 1'b1) ? rs2_fwd_data : rs2_data;
+
 logic [31:0] X;
 logic [31:0] Y;
 
-assign X = rs1_data;
-assign Y = (is_imm_type) ? {{20{imm[11]}}, imm} : rs2_data;
+assign X = internal_rs1_data;
+assign Y = (is_imm_type) ? {{20{imm[11]}}, imm} : internal_rs2_data;
 
 always_comb begin
     // NOP

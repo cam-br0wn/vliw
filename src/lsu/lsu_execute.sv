@@ -9,6 +9,10 @@ module lsu_execute
 (
     input   logic           is_load,
     input   logic           is_nop,
+    input   logic           is_rs1_fwd,
+    input   logic           is_rs2_fwd,
+    input   logic [31:0]    rs1_fwd_data,
+    input   logic [31:0]    rs2_fwd_data,
     input   logic [11:0]    imm,
     input   logic [31:0]    rs1_data,
     input   logic [31:0]    rs2_data,
@@ -18,10 +22,17 @@ module lsu_execute
     output  logic [31:0]    rd_addr
 );
 
+// forwarding logic
+logic [31:0] internal_rs1_data;
+logic [31:0] internal_rs2_data;
+
+assign internal_rs1_data = (is_rs1_fwd == 1'b1) ? rs1_fwd_data : rs1_data;
+assign internal_rs2_data = (is_rs2_fwd == 1'b1) ? rs2_fwd_data : rs2_data;
+
 always_comb begin
     // if LOAD
     if (is_load == 1'b1 && is_nop == 1'b0) begin
-        rd_addr = rs1_data + $signed({{20{imm[11]}}, imm}); // explictly sign-extend immediate
+        rd_addr = internal_rs1_data + $signed({{20{imm[11]}}, imm}); // explictly sign-extend immediate
         wr_addr = '0;
         wr_data = '0;
         wr_en = '0;
@@ -29,8 +40,8 @@ always_comb begin
     // if STORE
     else if (is_load == 1'b0 && is_nop == 1'b0) begin
         rd_addr = '0;
-        wr_addr = rs1 + $signed({{20{imm[11]}}, imm}); // explicitly sign-extend immediate
-        wr_data = rs2_data;
+        wr_addr = internal_rs1_data + $signed({{20{imm[11]}}, imm}); // explicitly sign-extend immediate
+        wr_data = internal_rs2_data;
         wr_en = 1'b1;
     end
     // if NOP

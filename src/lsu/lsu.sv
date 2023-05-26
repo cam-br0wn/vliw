@@ -25,7 +25,11 @@ module lsu
     // register to store data in on loads
     output  logic [4:0]     rd_out,
     // register file write enable
-    output  logic           reg_file_wr_en
+    output  logic           reg_file_wr_en,
+    // need to inform hazard detection if execute is a load
+    output  logic           ex_is_load,
+    // need to inform forwarding unit if the writeback is a load
+    output  logic           wb_is_load
     
 );
 
@@ -97,6 +101,8 @@ lsu_execute lsu_execute_instance (
     .rd_addr(rd_addr)
 );
 
+assign ex_is_load = idex_is_load;
+
 // EX/WB reg -> writeback signals
 logic           exwb_is_load;
 logic           exwb_zero_ext;
@@ -130,5 +136,7 @@ lsu_writeback lsu_writeback_instance (
     .data_out(mem_data_out),
     .wr_en(reg_file_wr_en)
 );
+
+assign wb_is_load = exwb_is_load;
 
 endmodule
