@@ -18,10 +18,10 @@ module hazard_detection
     input   logic [4:0]         lsu_dc_rs1,
     input   logic [4:0]         lsu_dc_rs2,
     // stall output signal
-    output  logic               stall_out
+    output  logic               stall_out,
 
     // branch taken
-    input   logic               branch_taken
+    input   logic               branch_taken,
     // squash output signal
     output  logic               squash_out
 );

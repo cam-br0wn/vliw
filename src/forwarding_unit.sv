@@ -31,7 +31,7 @@ module forwarding_unit
     output  logic               lsu_rs1_fwd,
     output  logic               lsu_rs2_fwd,
     output  logic               branch_rs1_fwd,
-    output  logic               branch_rs2_fwd
+    output  logic               branch_rs2_fwd,
     // these signals will be the selector bits for muxes within execute stages to pick either reg file or wb data
 
     // need to encode where the data is coming from for each unit

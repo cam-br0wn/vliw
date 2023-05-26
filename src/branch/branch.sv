@@ -17,10 +17,16 @@ module branch
     // destination reg addr, data, write en
     output  logic [4:0]     rd_out,
     output  logic [31:0]    ret_addr,
-    output  logic           reg_file_wr_en
+    output  logic           reg_file_wr_en,
     // branch taken outcome (need so we can squash previous cycle)
     output  logic           branch_taken,
-    output  logic [31:0]    new_pc
+    output  logic [31:0]    new_pc,
+
+    // forwarding inputs
+    input   logic           is_rs1_fwd,
+    input   logic           is_rs2_fwd,
+    input   logic [31:0]    rs1_fwd_data,
+    input   logic [31:0]    rs2_fwd_data
 );
 
 // internal signals coming out of decode
@@ -87,6 +93,10 @@ branch_execute branch_execute_instance (
     .zero_ext(idex_zero_ext),
     .is_jmp(idex_is_jmp),
     .is_imm_type(idex_is_imm_type),
+    .is_rs1_fwd(is_rs1_fwd),
+    .is_rs2_fwd(is_rs2_fwd),
+    .rs1_fwd_data(rs1_fwd_data),
+    .rs2_fwd_data(rs2_fwd_data),
     .pc(idex_pc),
     .op(idex_op),
     .rs1_data(rs1_data),

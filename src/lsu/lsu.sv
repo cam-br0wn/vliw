@@ -18,7 +18,7 @@ module lsu
     output  logic [31:0]    wr_data,
     output  logic           wr_en,
     // read addr for loads
-    output  logic [31:0]    rd_addr
+    output  logic [31:0]    rd_addr,
     // data streams to and from memory for writeback
     input   logic [31:0]    mem_data_in,
     output  logic [31:0]    mem_data_out,
@@ -29,8 +29,13 @@ module lsu
     // need to inform hazard detection if execute is a load
     output  logic           ex_is_load,
     // need to inform forwarding unit if the writeback is a load
-    output  logic           wb_is_load
-    
+    output  logic           wb_is_load,
+
+    // forwarding inputs
+    input   logic           is_rs1_fwd,
+    input   logic           is_rs2_fwd,
+    input   logic [31:0]    rs1_fwd_data,
+    input   logic [31:0]    rs2_fwd_data
 );
 
 // Decode -> ID/EX reg signals
@@ -92,6 +97,10 @@ assign rs2_out = idex_rs2;
 lsu_execute lsu_execute_instance (
     .is_load(idex_is_load),
     .is_nop(idex_is_nop),
+    .is_rs1_fwd(is_rs1_fwd),
+    .is_rs2_fwd(is_rs2_fwd),
+    .rs1_fwd_data(rs1_fwd_data),
+    .rs2_fwd_data(rs2_fwd_data),
     .imm(idex_imm),
     .rs1_data(rs1_data),
     .rs2_data(rs2_data),

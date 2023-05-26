@@ -18,7 +18,7 @@ module register_file (
   input   logic [31:0]  ixu1_wr_data,
   input   logic         ixu1_wr_en,
   output  logic [31:0]  ixu1_rs1_data,
-  output  logic [31:0]  ixu1_rs2_data
+  output  logic [31:0]  ixu1_rs2_data,
 
   // IXU2 ports
   input   logic [4:0]   ixu2_rs1,
@@ -46,7 +46,9 @@ module register_file (
 
   always_ff @(posedge clk) begin
     if (rst == 1'b1) begin
-      regs <= '0;
+      for (int i = 0; i < 32; i = i+1) begin
+        regs[i] <= '0;
+      end
     end
     else begin
       if (lsu_wr_en == 1'b1) begin

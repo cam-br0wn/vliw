@@ -16,7 +16,7 @@ always_comb begin
     // if it's a NOP or a store
     if (is_nop == 1'b1 || is_load == 1'b0) begin
         data_out = '0;
-        wr_en = '0
+        wr_en = '0;
     end
     // loads
     else if (is_load == 1'b1) begin

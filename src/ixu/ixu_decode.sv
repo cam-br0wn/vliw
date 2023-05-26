@@ -71,7 +71,7 @@ always_comb begin
     end else if (funct3 == 3'h2) begin
         op = 4'h8;
     // SLTU
-    end else (funct3 == 3'h3) begin
+    end else if (funct3 == 3'h3) begin
         op = 4'h9;
     // invalid funct3
     end else begin
