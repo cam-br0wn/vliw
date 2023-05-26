@@ -12,17 +12,22 @@ module branch_execute
     input   logic [31:0]    rs2_data,
     input   logic [21:0]    imm,
     output  logic           branch_taken,
-    output  logic           new_pc
+    output  logic [31:0]    new_pc
+    output  logic [4:0]     ret_addr,
+    output  logic           rd_wr_en
 );
 
 logic [31:0] internal_imm;
 // if it's a JAL, only sign extend by 10 bits, otherwise sign extend by 20
 assign internal_imm = (is_jmp == '1 && is_imm_type == '0) ? {{10{imm[21]}}, imm} : {{20{imm[11]}}, imm};
+// if it's a JALR, put PC + 4 into rd
+assign ret_addr = $signed(pc) + $signed(32'h00000004);
+assign rd_wr_en = (is_jmp == '1 && is_imm_type == '1) ? '1 : '0;
 
 always_comb begin
     if (is_nop == '0) begin
         // branch instruction
-        if (is_jmp == '0 && is_imm_type == '0) begin
+        if (is_jmp == '0) begin
             // BEQ
             if (op == 2'h0) begin
                 branch_taken = (rs1_data == rs2_data) ? '1 : '0;
@@ -58,13 +63,8 @@ always_comb begin
                 $error("BRANCH EXEC ERROR: branch opcode bits not driven");
             end
 
-        // JAL
-        end else if (is_jmp == '1 && is_imm_type == '0) begin
-            branch_taken = '1;
-            new_pc = $signed(pc) + $signed(internal_imm);
-            
-        // JALR
-        end else if (is_jmp == '1 && is_imm_type == '1) begin
+        // JAL or JALR
+        end else if (is_jmp == '1) begin
             branch_taken = '1;
             new_pc = $signed(pc) + $signed(internal_imm);
 
