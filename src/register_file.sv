@@ -45,6 +45,9 @@ module register_file (
   // logic no_dest_reg_overlap = (lsu_rd == ixu1_rd || (lsu_rd == ixu2_rd || ixu1_rd == ixu2_rd)) ? '0 : '1;
 
   always_ff @(posedge clk) begin
+    // the zero register is always 0
+    regs[0] <= '0;
+
     if (rst == 1'b1) begin
       for (int i = 0; i < 32; i = i+1) begin
         regs[i] <= '0;
@@ -52,16 +55,16 @@ module register_file (
     end
     else begin
       if (lsu_wr_en == 1'b1) begin
-        regs[lsu_rd] <= lsu_wr_data;
+        regs[lsu_rd] <= (lsu_rd == '0) ? '0 : lsu_wr_data;
       end
       if (ixu1_wr_en == 1'b1) begin
-        regs[ixu1_rd] <= ixu1_wr_data;
+        regs[ixu1_rd] <= (ixu1_rd == '0) ? '0 : ixu1_wr_data;
       end
       if (ixu2_wr_en == 1'b1) begin
-        regs[ixu2_rd] <= ixu2_wr_data;
+        regs[ixu2_rd] <= (ixu2_rd == '0)? '0 : ixu2_wr_data;
       end
       if (branch_wr_en == 1'b1) begin
-        regs[branch_rd] <= branch_wr_data;
+        regs[branch_rd] <= (branch_rd == '0) ? '0 : branch_wr_data;
       end
     end
   end
