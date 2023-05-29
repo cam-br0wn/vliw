@@ -4,6 +4,7 @@ module program_counter
 (
     input   logic           clk,
     input   logic           rst,
+    input   logic           stall,
     input   logic           branch_taken,
     input   logic [31:0]    new_pc,
     output  logic [31:0]    pc,
@@ -27,6 +28,9 @@ always_ff @ (posedge clk or posedge rst) begin
     else if (branch_taken == 1'b1) begin
         program_counter <= new_pc;
         squash <= '1;
+    end
+    else if (stall == 1'b1) begin
+        program_counter <= program_counter;
     end
     else begin
         // add decimal 16 to pc on every clock pulse b/c 4 inst * 4 B/inst = 16B

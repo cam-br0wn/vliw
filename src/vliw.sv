@@ -181,6 +181,7 @@ program_counter pc
 (
     .clk(clk),
     .rst(rst),
+    .stall(),
     .branch_taken(),
     .new_pc(),
     .pc(),
