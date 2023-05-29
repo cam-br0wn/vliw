@@ -173,11 +173,7 @@ hazard_detection hzd
     .lsu_dc_rs1(),
     .lsu_dc_rs2(),
     // stall output signal
-    .stall_out(),
-    // branch taken
-    .branch_taken(),
-    // squash output signal
-    .squash_out()
+    .stall_out()
 );
 
 // program counter
