@@ -21,7 +21,10 @@ module ixu
     input   logic           is_rs1_fwd,
     input   logic           is_rs2_fwd,
     input   logic [31:0]    rs1_fwd_data,
-    input   logic [31:0]    rs2_fwd_data
+    input   logic [31:0]    rs2_fwd_data,
+
+    // squash from PC after branch taken
+    input   logic           branch_squash
 );
 
 // Decode -> ID/EX register internal signals
@@ -50,6 +53,9 @@ logic           idex_is_nop;
 logic           idex_is_imm_type;
 logic [4:0]     idex_rd;
 logic [11:0]    idex_imm;
+// internal signal to or the decode is_nop with squash
+logic           decode_nop_or_squash;
+assign decode_nop_or_squash = decode_is_nop || branch_squash;
 
 ixu_id_ex ixu_id_ex_reg (
     .clk(clk),
@@ -92,12 +98,16 @@ ixu_execute ixu_execute_instance (
 logic           exwb_is_nop;
 logic [4:0]     exwb_rd;
 logic [31:0]    exwb_data;
+// internal signal to or the execute is_nop with squash
+logic           exec_nop_or_squash;
+assign exec_nop_or_squash = idex_is_nop || branch_squash;
+
 
 ixu_ex_wb ixu_ex_wb_reg (
     .clk(clk),
     .rst(rst),
     .stall(stall),
-    .is_nop_in(idex_is_nop),
+    .is_nop_in(exec_nop_or_squash),
     .rd_in(idex_rd),
     .data_in(execute_data),
     .is_nop_out(exwb_is_nop),

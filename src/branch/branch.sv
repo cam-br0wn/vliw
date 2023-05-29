@@ -26,7 +26,10 @@ module branch
     input   logic           is_rs1_fwd,
     input   logic           is_rs2_fwd,
     input   logic [31:0]    rs1_fwd_data,
-    input   logic [31:0]    rs2_fwd_data
+    input   logic [31:0]    rs2_fwd_data,
+
+    // squash from PC after branch taken
+    input   logic           branch_squash
 );
 
 // internal signals coming out of decode
@@ -61,12 +64,15 @@ logic           idex_zero_ext;
 logic [1:0]     idex_op;
 logic [21:0]    idex_imm;
 logic [31:0]    idex_pc;
+// internal signal to or the decode is_nop with squash
+logic           decode_nop_or_squash;
+assign decode_nop_or_squash = decode_is_nop || branch_squash;
 
 branch_id_ex branch_id_ex_reg (
     .clk(clk),
     .rst(rst),
     .stall(stall),
-    .is_nop_in(decode_is_nop),
+    .is_nop_in(decode_nop_or_squash),
     .is_jmp_in(decode_is_jmp),
     .is_imm_type_in(decode_is_imm_type),
     .zero_ext_in(decode_zero_ext),

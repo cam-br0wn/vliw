@@ -35,7 +35,10 @@ module lsu
     input   logic           is_rs1_fwd,
     input   logic           is_rs2_fwd,
     input   logic [31:0]    rs1_fwd_data,
-    input   logic [31:0]    rs2_fwd_data
+    input   logic [31:0]    rs2_fwd_data,
+
+    // squash from PC after branch taken
+    input   logic           branch_squash
 );
 
 // Decode -> ID/EX reg signals
@@ -56,6 +59,13 @@ logic [4:0]     idex_rs1;
 logic [4:0]     idex_rs2;
 logic [11:0]    idex_imm;
 
+// internal signal to or the decode is_nop with squash
+logic           decode_nop_or_squash;
+assign decode_nop_or_squash = decode_is_nop || branch_squash;
+// internal signal to or the execute is_nop with squash
+logic           decode_nop_or_squash;
+assign exec_nop_or_squash = idex_is_nop || branch_squash;
+
 lsu_decode lsu_decode_instance (
     .inst(inst),
     .is_load(decode_is_load),
@@ -74,7 +84,7 @@ lsu_id_ex lsu_id_ex_register (
     .stall(stall),
     .is_load_in(decode_is_load),
     .zero_ext_in(decode_zero_ext),
-    .is_nop_in(decode_is_nop),
+    .is_nop_in(decode_nop_or_squash),
     .size_in(decode_size),
     .rs1_in(decode_rs1),
     .rs2_in(decode_rs2),
@@ -125,7 +135,7 @@ lsu_ex_wb lsu_ex_wb_register (
     .stall(stall),
     .is_load_in(idex_is_load),
     .zero_ext_in(idex_zero_ext),
-    .is_nop_in(idex_is_nop),
+    .is_nop_in(exec_nop_or_squash),
     .size_in(idex_size),
     .rd_in(idex_rd),
     .is_load_out(exwb_is_load),
