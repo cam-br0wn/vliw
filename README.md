@@ -17,6 +17,7 @@ This is a very rudimentary implementation of a VLIW RISC-V architecture does as 
 - Wire up the top level
 - Write compatible binaries and top-level testbench
 - Make sure reading indexing of 4-inst bundles is correct from inst mem -> decode
+- *check behavior of inst mem/PC on stalls*
 
 ### For future consideration
 - Floating point
