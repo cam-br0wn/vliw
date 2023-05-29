@@ -13,10 +13,10 @@ This is a very rudimentary implementation of a VLIW RISC-V architecture does as 
 
 
 ### To-do
-- Get decode squashing working upon branch taken
 - Hook up the destination registers of writeback to the hazard detector
-- Write the fetch logic
-- Write the instruction memory file (in theory prefetching?)
+- Wire up the top level
+- Write compatible binaries and top-level testbench
+- Make sure reading indexing of 4-inst bundles is correct from inst mem -> decode
 
 ### For future consideration
 - Floating point
