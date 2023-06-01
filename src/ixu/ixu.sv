@@ -22,6 +22,11 @@ module ixu
     input   logic           is_rs2_fwd,
     input   logic [31:0]    rs1_fwd_data,
     input   logic [31:0]    rs2_fwd_data,
+    output  logic [4:0]     wb_rd_out,
+
+    // hazard signals
+    output  logic [4:0]     dc_rs1,
+    output  logic [4:0]     dc_rs2,
 
     // squash from PC after branch taken
     input   logic           branch_squash
@@ -35,6 +40,9 @@ logic [4:0]     decode_rs1;
 logic [4:0]     decode_rs2;
 logic [4:0]     decode_rd;
 logic [11:0]    decode_imm;
+
+assign dc_rs1 = decode_rs1;
+assign dc_rs2 = decode_rs2;
 
 ixu_decode ixu_decode_instance (
     .inst(inst),
@@ -102,6 +110,7 @@ logic [31:0]    exwb_data;
 logic           exec_nop_or_squash;
 assign exec_nop_or_squash = idex_is_nop || branch_squash;
 
+assign wb_rd_out = exwb_rd;
 
 ixu_ex_wb ixu_ex_wb_reg (
     .clk(clk),

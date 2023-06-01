@@ -28,6 +28,10 @@ module branch
     input   logic [31:0]    rs1_fwd_data,
     input   logic [31:0]    rs2_fwd_data,
 
+    // hazard signals
+    output  logic [4:0]     dc_rs1,
+    output  logic [4:0]     dc_rs2,
+
     // squash from PC after branch taken
     input   logic           branch_squash
 );
@@ -42,6 +46,9 @@ logic [4:0]     decode_rs1;
 logic [4:0]     decode_rs2;
 logic [4:0]     decode_rd;
 logic [21:0]    decode_imm;
+
+assign dc_rs1 = decode_rs1;
+assign dc_rs2 = decode_rs2;
 
 branch_decode branch_decode_instance (
     .inst(inst),

@@ -18,10 +18,11 @@ module lsu
     output  logic [31:0]    wr_data,
     output  logic           wr_en,
     // read addr for loads
-    output  logic [31:0]    rd_addr,
-    // data streams to and from memory for writeback
-    input   logic [31:0]    mem_data_in,
-    output  logic [31:0]    mem_data_out,
+    input   logic [31:0]    rd_data,    // data coming back from ram
+    output  logic [31:0]    rd_addr,    // address to read from
+    output  logic           rd_en,      // read enable
+    // data to be written to reg file
+    input   logic [31:0]    data_out,   
     // register to store data in on loads
     output  logic [4:0]     rd_out,
     // register file write enable
@@ -36,6 +37,11 @@ module lsu
     input   logic           is_rs2_fwd,
     input   logic [31:0]    rs1_fwd_data,
     input   logic [31:0]    rs2_fwd_data,
+    output  logic [4:0]     wb_rd_out,
+
+    // hazard signals
+    output  logic [4:0]     dc_rs1,
+    output  logic [4:0]     dc_rs2,
 
     // squash from PC after branch taken
     input   logic           branch_squash
@@ -49,6 +55,9 @@ logic [1:0]     decode_size;
 logic [4:0]     decode_rs1;
 logic [4:0]     decode_rs2;
 logic [11:0]    decode_imm;
+
+assign dc_rs1 = decode_rs1;
+assign dc_rs2 = decode_rs2;
 
 // ID/EX reg -> execute signals
 logic           idex_is_load;
@@ -117,7 +126,8 @@ lsu_execute lsu_execute_instance (
     .wr_addr(wr_addr),
     .wr_data(wr_data),
     .wr_en(wr_en),
-    .rd_addr(rd_addr)
+    .rd_addr(rd_addr),
+    .rd_en(rd_en)
 );
 
 assign ex_is_load = idex_is_load;
@@ -128,6 +138,8 @@ logic           exwb_zero_ext;
 logic           exwb_is_nop;
 logic [1:0]     exwb_size;
 logic [4:0]     exwb_rd;
+
+assign wb_rd_out = exwb_rd;
 
 lsu_ex_wb lsu_ex_wb_register (
     .clk(clk),
@@ -149,10 +161,10 @@ lsu_writeback lsu_writeback_instance (
     .is_nop(exwb_is_nop),
     .is_load(exwb_is_load),
     .rd(exwb_rd),
-    .data_in(mem_data_in),
+    .data_in(rd_data),
     .size(exwb_size),
     .zero_ext(exwb_zero_ext),
-    .data_out(mem_data_out),
+    .data_out(data_out),
     .wr_en(reg_file_wr_en)
 );
 

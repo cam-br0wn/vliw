@@ -14,6 +14,8 @@ module hazard_detection
     input   logic [4:0]         ixu2_dc_rs2,
     input   logic [4:0]         lsu_dc_rs1,
     input   logic [4:0]         lsu_dc_rs2,
+    input   logic [4:0]         bru_dc_rs1,
+    input   logic [4:0]         bru_dc_rs2,
     // stall output signal
     output  logic               stall_out
 );
@@ -26,7 +28,9 @@ always_comb begin
         (ixu2_dc_rs1 == lsu_ex_rd) || 
         (ixu2_dc_rs2 == lsu_ex_rd) || 
         (lsu_dc_rs1 == lsu_ex_rd) || 
-        (lsu_dc_rs2 == lsu_ex_rd)) && lsu_ex_is_load 
+        (lsu_dc_rs2 == lsu_ex_rd) ||
+        (bru_dc_rs1 == lsu_ex_rd) || 
+        (bru_dc_rs2 == lsu_ex_rd)) && lsu_ex_is_load 
     ) ? '1 : '0;
 end
 

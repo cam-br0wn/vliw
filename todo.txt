@@ -1,0 +1,5 @@
+To-do list:
+- figure out timing with program counter 
+    - accessing memory with PC x will take a cycle to hit pipeline
+    - branch unit needs this PC, but not too early
+- implement stalling when loads happen
