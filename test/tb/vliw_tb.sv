@@ -3,8 +3,10 @@ module vliw_tb;
 
 logic clk;
 logic rst;
+parameter test_file = "../test/bin/test1.hex";
 
-vliw dut (
+vliw #(test_file)
+dut (
     .clk(clk),
     .rst(rst)
 );
