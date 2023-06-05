@@ -40,7 +40,7 @@ module register_file (
 );
 
   // 32x 32b registers
-  logic [4:0] regs [0:31];
+  logic [4:0] regs [31:0];
 
   // logic no_dest_reg_overlap = (lsu_rd == ixu1_rd || (lsu_rd == ixu2_rd || ixu1_rd == ixu2_rd)) ? '0 : '1;
 
@@ -52,7 +52,6 @@ module register_file (
       for (int i = 0; i < 31; i = i+1) begin
         regs[i] <= '0;
       end
-      regs[31] <= 32'h00400020;
     end
     else begin
       if (lsu_wr_en == 1'b1) begin
@@ -62,7 +61,7 @@ module register_file (
         regs[ixu1_rd] <= (ixu1_rd == '0) ? '0 : ixu1_wr_data;
       end
       if (ixu2_wr_en == 1'b1) begin
-        regs[ixu2_rd] <= (ixu2_rd == '0)? '0 : ixu2_wr_data;
+        regs[ixu2_rd] <= (ixu2_rd == '0) ? '0 : ixu2_wr_data;
       end
       if (branch_wr_en == 1'b1) begin
         regs[branch_rd] <= (branch_rd == '0) ? '0 : branch_wr_data;
