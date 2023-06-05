@@ -17,68 +17,129 @@ logic [6:0] funct7;
 
 assign opcode = inst[6:0];
 assign funct3 = inst[14:12];
-assign funct7 = inst[31:25];
 assign rs1 = inst[19:15];
 assign rd = inst[11:7];
 
 // drive an output signal to be used on a mux between reg file and pipeline reg
 always_comb begin
-    if (inst == 32'h0) begin
-        is_nop = 1'b1;
-        rs2 = '0;
-        imm = '0;
-    // R-type
-    end else if (opcode == 7'b0110011) begin
-        is_imm_type = 1'b0;
-        is_nop = 1'b0;
+    // R-type instruction
+    if (opcode == 7'b0110011) begin
+        funct7 = inst[31:25];
         rs2 = inst[24:20];
         imm = '0;
-    // I-type
-    end else if (opcode == 7'b0010011) begin
-        is_imm_type = 1'b1;
-        is_nop = 1'b0;
+        is_imm_type = '0;
+        is_nop = '0;
+        // add or sub
+        if (funct3 == 3'h0) begin
+            // add
+            if (funct7 == 7'h00) begin
+                op = 4'h0;
+            end
+            // sub
+            else if (funct7 == 7'h20) begin
+                op = 4'h1;
+            end
+        end
+        // xor
+        else if (funct3 == 3'h4) begin
+            op = 4'h2;
+        end
+        // or
+        else if (funct3 == 3'h6) begin
+            op = 4'h3;
+        end
+        // and
+        else if (funct3 == 3'h7) begin
+            op = 4'h4;
+        end
+        // sll
+        else if (funct3 == 3'h1) begin
+            op = 4'h5;
+        end
+        // srl or sra
+        else if (funct3 == 3'h5) begin
+            // srl
+            if (funct7 == 7'h00) begin
+                op = 4'h6;
+            end
+            // sra
+            else if (funct7 == 7'h20) begin
+                op = 4'h7;
+            end
+        end
+        // slt
+        else if (funct3 == 3'h2) begin
+            op = 4'h8;
+        end
+        // sltu
+        else if (funct3 == 3'h3) begin
+            op = 4'h9;
+        end
+        else begin
+            $error("IXU DECODE ERROR: could not decode IXU reg instr");
+        end
+    end
+    // I-type instruction
+    else if (opcode == 7'b0010011) begin
+        funct7 = '0;
         rs2 = '0;
         imm = inst[31:20];
-
-    // Neither and not a NOP (which is wrong)
-    end else begin
-        $error("IXU DECODE ERROR: invalid opcode");
+        is_imm_type = '1;
+        is_nop = '0;
+        // addi
+        if (funct3 == 3'h0) begin
+            op = 4'h0;
+        end
+        // xori
+        else if (funct3 == 3'h4) begin
+            op = 4'h2;
+        end
+        // ori
+        else if (funct3 == 3'h6) begin
+            op = 4'h3;
+        end
+        // andi
+        else if (funct3 == 3'h7) begin
+            op = 4'h4;
+        end
+        // slli
+        else if (funct3 == 3'h1) begin
+            op = 4'h5;
+        end
+        // srli or srai
+        else if (funct3 == 3'h5) begin
+            // srli
+            if (imm[11:5] == 7'h00) begin
+                op = 4'h6;
+            end
+            // srai
+            else if (imm[11:5] == 7'h20) begin
+                op = 4'h7;
+            end
+        end
+        // slti
+        else if (funct3 == 3'h2) begin
+            op = 4'h8;
+        end
+        // sltiu
+        else if (funct3 == 3'h3) begin
+            op = 4'h9;
+        end
+        else begin
+            $error("IXU DECODE ERROR: could not decode IXU imm instr");
+        end
+    end
+    // NOP
+    else if (inst == 32'h00000000) begin
+        funct7 = '0;
+        rs2 = '0;
+        imm = '0;
+        is_imm_type = '0;
+        is_nop = '1;
+    end
+    else begin
+        $error("IXU DECODE ERROR: invalid IXU instr");
     end
 end
-
-// determine op bits
-always_comb begin
-    // parse funct3
-    // either ADD or SUB
-    if (funct3 == 3'h0) begin
-        op = (funct7 == 7'h00) ? 4'h0 : 4'h1;
-    // XOR
-    end else if (funct3 == 3'h4) begin
-        op = 4'h2;
-    // OR
-    end else if (funct3 == 3'h6) begin
-        op = 4'h3;
-    // AND
-    end else if (funct3 == 3'h7) begin
-        op = 4'h4;
-    // SLL
-    end else if (funct3 == 3'h1) begin
-        op = 4'h5;
-    // SRL or SRA
-    end else if (funct3 == 3'h5) begin
-        op = (funct7 == 7'h00) ? 4'h6 : 4'h7;
-    // SLT
-    end else if (funct3 == 3'h2) begin
-        op = 4'h8;
-    // SLTU
-    end else if (funct3 == 3'h3) begin
-        op = 4'h9;
-    // invalid funct3
-    end else begin
-        $error("INVALID FUNCT3 BITS");
-        op = 4'hF;
-    end
-end
-
 
 endmodule
