@@ -17,7 +17,7 @@ module branch_execute
     input   logic [21:0]    imm,
     output  logic           branch_taken,
     output  logic [31:0]    new_pc,
-    output  logic [4:0]     ret_addr,
+    output  logic [31:0]    ret_addr,
     output  logic           rd_wr_en
 );
 

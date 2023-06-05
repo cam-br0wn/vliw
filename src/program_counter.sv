@@ -22,7 +22,7 @@ always_ff @ (posedge clk or posedge rst) begin
 
     if (rst == 1'b1) begin
         // initialize the program counter to address 0x00400020
-        program_counter <= 32'h00400020;
+        program_counter <= 32'h00000004;
         squash <= '0;
     end
     else if (branch_taken == 1'b1) begin

@@ -5,7 +5,6 @@ module main_memory #(
     input   logic         clk,
     input   logic         rst,
     // ports for LSU
-    input   logic [31:0]  data_in,
     input   logic [31:0]  wr_addr,
     input   logic [31:0]  wr_data,
     input   logic         wr_en,
@@ -36,22 +35,23 @@ logic [8*100:1] line;
 logic [31:0] dbuf;
 
 // Define the memory array
-logic [31:0] mem [1024:0][1:0];
+logic [31:0] mem [31:0][1:0];
 
 // Write to the memory array when write_en is high
 always_ff @(posedge clk) begin
-    if (wr_en) mem[wr_addr][1] <= data_in;
+    if (wr_en) mem[wr_addr][1] <= wr_data;
 end
 
 // Read from the memory array
 always_ff @(posedge clk) begin
-    if (rd_en) data_out <= mem[rd_addr][1];
-    inst_bundle_out <= mem[pc_in][1];
+    if (rd_en) data_out <= mem[rd_addr / 4][1];
 end
+
+assign inst_bundle_out = {mem[pc_in / 4][1], mem[(pc_in + 4) / 4][1], mem[(pc_in + 8) / 4][1], mem[(pc_in + 12) / 4][1]};
 
 task reset;
     begin
-    for(int i = 0; i < 1024; i++) begin
+    for(int i = 0; i < 32; i++) begin
         mem[i][0] <= '0;
         mem[i][1] <= '0;
     end
@@ -95,8 +95,8 @@ task initialize;
 endtask
 
 always @(posedge rst) begin
-    $display("Resetting RAM to 0s...");
-    reset();
+    // $display("Resetting RAM to 0s...");
+    // reset();
     $display("Initialzing RAM with program values...");
     initialize();
 end

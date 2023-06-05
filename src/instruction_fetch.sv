@@ -2,7 +2,7 @@
 
 module instruction_fetch
 (
-    input   logic           pc_in,
+    input   logic [31:0]    pc_in,
     input   logic [127:0]   inst_bundle,
     output  logic [31:0]    pc_out,
     output  logic [31:0]    ixu1_inst,

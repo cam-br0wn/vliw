@@ -116,7 +116,7 @@ logic [4:0]     ixu2_dc_rs2;
 // LSU
 logic [4:0]     lsu_dc_rs1;
 logic [4:0]     lsu_dc_rs2;
-logic [4:0]     lsu_ex_is_load;
+logic           lsu_ex_is_load;
 // BRANCH
 logic [4:0]     bru_dc_rs1;
 logic [4:0]     bru_dc_rs2;
@@ -178,20 +178,26 @@ lsu lsu_instance
     .clk(clk),
     .rst(rst),
     .stall(haz_det_stall),
+
     .inst(lsu_inst),
+
     .rs1_out(lsu_rs1_out),
     .rs2_out(lsu_rs2_out),
+
     .rs1_data(lsu_rs1_data),
     .rs2_data(lsu_rs2_data),
+
     .wr_addr(lsu_wr_addr),
     .wr_data(lsu_wr_data),
     .wr_en(lsu_wr_en),
+
     .rd_data(lsu_rd_data),  // data from MEM -> LSU
     .rd_addr(lsu_rd_addr),
     .rd_en(lsu_rd_en),
+
     .data_out(lsu_data_out), // data from LSU -> reg file
     .rd_out(lsu_rd_out),
-    .wb_rd_out(lsu_wb_rd),
+    
     .reg_file_wr_en(lsu_reg_file_wr_en),
     .ex_is_load(lsu_ex_is_load),
     .wb_is_load(lsu_wb_is_load),
@@ -199,6 +205,7 @@ lsu lsu_instance
     .is_rs2_fwd(lsu_is_rs2_fwd),
     .rs1_fwd_data(lsu_rs1_fwd_data),
     .rs2_fwd_data(lsu_rs2_fwd_data),
+    .wb_rd_out(lsu_wb_rd),
     .dc_rs1(lsu_dc_rs1),
     .dc_rs2(lsu_dc_rs2),
     .branch_squash(pc_squash_out)
@@ -261,7 +268,7 @@ register_file reg_file
     .ixu2_wr_data(ixu2_data_out),
     .ixu2_wr_en(ixu2_reg_file_wr_en),
     .ixu2_rs1_data(ixu2_rs1_data),
-    .ixu2_rs2_data(ixu1_rs2_data),
+    .ixu2_rs2_data(ixu2_rs2_data),
 
     // BRANCH ports
     .branch_rs1(bru_rs1_out),
@@ -304,6 +311,8 @@ hazard_detection hzd
     .ixu2_dc_rs2(ixu2_dc_rs2),
     .lsu_dc_rs1(lsu_dc_rs1),
     .lsu_dc_rs2(lsu_dc_rs2),
+    .bru_dc_rs1(bru_dc_rs1),
+    .bru_dc_rs2(bru_dc_rs2),
     // stall output signal
     .stall_out(haz_det_stall)
 );

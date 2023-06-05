@@ -54,6 +54,7 @@ logic           decode_is_nop;
 logic [1:0]     decode_size;
 logic [4:0]     decode_rs1;
 logic [4:0]     decode_rs2;
+logic [4:0]     decode_rd;
 logic [11:0]    decode_imm;
 
 assign dc_rs1 = decode_rs1;
@@ -66,6 +67,7 @@ logic           idex_is_nop;
 logic [1:0]     idex_size;
 logic [4:0]     idex_rs1;
 logic [4:0]     idex_rs2;
+logic [4:0]     idex_rd;
 logic [11:0]    idex_imm;
 
 // internal signal to or the decode is_nop with squash
