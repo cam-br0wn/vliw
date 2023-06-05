@@ -119,13 +119,15 @@ logic [4:0]     lsu_ex_is_load;
 logic [4:0]     bru_dc_rs1;
 logic [4:0]     bru_dc_rs2;
 
+logic           haz_det_stall;
+
 //// module instances ////
 // IXU 1
 ixu ixu_1
 (
     .clk(clk),
     .rst(rst),
-    .stall(),
+    .stall(haz_det_stall),
     .inst(ixu1_inst),
     .rs1_out(ixu1_rs1_out),
     .rs2_out(ixu1_rs2_out),
@@ -149,7 +151,7 @@ ixu ixu_2
 (
     .clk(clk),
     .rst(rst),
-    .stall(),
+    .stall(haz_det_stall),
     .inst(ixu2_inst),
     .rs1_out(ixu2_rs1_out),
     .rs2_out(ixu2_rs2_out),
@@ -173,7 +175,7 @@ lsu lsu_inst
 (
     .clk(clk),
     .rst(rst),
-    .stall(),
+    .stall(haz_det_stall),
     .inst(lsu_inst),
     .rs1_out(lsu_rs1_out),
     .rs2_out(lsu_rs2_out),
@@ -205,7 +207,7 @@ branch bru
 (
     .clk(clk),
     .rst(rst),
-    .stall(),
+    .stall(haz_det_stall),
     .inst(bru_inst),
     .inst_pc(),
     .rs1_out(bru_rs1_out),
@@ -299,7 +301,7 @@ hazard_detection hzd
     .lsu_dc_rs1(lsu_dc_rs1),
     .lsu_dc_rs2(lsu_dc_rs2),
     // stall output signal
-    .stall_out()
+    .stall_out(haz_det_stall)
 );
 
 // program counter
@@ -307,7 +309,7 @@ program_counter pc
 (
     .clk(clk),
     .rst(rst),
-    .stall(),
+    .stall(haz_det_stall),
     .branch_taken(bru_branch_taken_out),
     .new_pc(bru_new_pc_out),
     .pc(pc_data_out),
