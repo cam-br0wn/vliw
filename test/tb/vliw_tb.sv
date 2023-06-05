@@ -1,4 +1,5 @@
 // top level testbench
+`timescale 1ns/1ns
 module vliw_tb;
 
 logic clk;
