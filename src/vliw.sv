@@ -173,7 +173,7 @@ ixu ixu_2
 );
 
 // LSU
-lsu lsu_inst
+lsu lsu_instance
 (
     .clk(clk),
     .rst(rst),
@@ -231,7 +231,7 @@ branch bru
 );
 
 // reg file
-register_file reg 
+register_file reg_file 
 (
     .clk(clk),
     .rst(rst),
@@ -275,7 +275,7 @@ register_file reg
 
 // memory module
 main_memory #(
-    program_file = ram_file
+    ram_file
 ) ram
 (
     .clk(clk),

@@ -11,7 +11,7 @@ module main_memory #(
     input   logic         wr_en,
     input   logic [31:0]  rd_addr,
     input   logic         rd_en,
-    output  logic [31:0]  data_out
+    output  logic [31:0]  data_out,
     // ports for inst fetch
     input   logic [31:0]  pc_in,
     output  logic [127:0] inst_bundle_out
@@ -40,13 +40,13 @@ logic [31:0] mem [1024:0][1:0];
 
 // Write to the memory array when write_en is high
 always_ff @(posedge clk) begin
-    if (wr_en) mem[wr_addr] <= data_in;
+    if (wr_en) mem[wr_addr][1] <= data_in;
 end
 
 // Read from the memory array
 always_ff @(posedge clk) begin
-    if (rd_en) data_out <= mem[rd_addr];
-    inst_bundle_out <= mem[pc_in];
+    if (rd_en) data_out <= mem[rd_addr][1];
+    inst_bundle_out <= mem[pc_in][1];
 end
 
 task reset;

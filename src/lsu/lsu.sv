@@ -72,7 +72,7 @@ logic [11:0]    idex_imm;
 logic           decode_nop_or_squash;
 assign decode_nop_or_squash = decode_is_nop || branch_squash;
 // internal signal to or the execute is_nop with squash
-logic           decode_nop_or_squash;
+logic           exec_nop_or_squash;
 assign exec_nop_or_squash = idex_is_nop || branch_squash;
 
 lsu_decode lsu_decode_instance (
