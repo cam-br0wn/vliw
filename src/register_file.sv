@@ -49,9 +49,10 @@ module register_file (
     regs[0] <= '0;
 
     if (rst == 1'b1) begin
-      for (int i = 0; i < 32; i = i+1) begin
+      for (int i = 0; i < 31; i = i+1) begin
         regs[i] <= '0;
       end
+      regs[31] <= 32'h00400020;
     end
     else begin
       if (lsu_wr_en == 1'b1) begin

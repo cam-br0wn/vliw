@@ -1,6 +1,8 @@
 // Top level of whole design
 
-module vliw 
+module vliw #(
+    parameter ram_file = "../test/bin/test1.hex"
+)
 (
     input   logic           clk,
     input   logic           rst
@@ -272,7 +274,9 @@ register_file reg
 );
 
 // memory module
-main_memory ram
+main_memory #(
+    program_file = ram_file
+) ram
 (
     .clk(clk),
     .rst(rst),
