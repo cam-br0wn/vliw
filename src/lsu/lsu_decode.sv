@@ -74,6 +74,7 @@ always_comb begin
         is_load = '0;
         rs1 = '0;
         rs2 = '0;
+        rd = '0;
         imm = '0;
         zero_ext = '0;
         size = '0;

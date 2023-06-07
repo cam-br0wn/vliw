@@ -12,6 +12,10 @@ vsim -debugDB -classdebug -voptargs=+acc +notimingchecks -L work work.vliw_tb -w
 add wave -noupdate -group vliw_tb
 add wave -noupdate -group vliw_tb -radix hexadecimal /vliw_tb/*
 
+# add dut signals
+add wave -noupdate -group vliw_tb/dut
+add wave -noupdate -group vliw_tb/dut -radix hexadecimal /vliw_tb/dut/*
+
 # add the program counter
 add wave -noupdate -group vliw_tb/dut/pc
 add wave -noupdate -group vliw_tb/dut/pc -radix hexadecimal /vliw_tb/dut/pc/*
@@ -36,6 +40,10 @@ add wave -noupdate -group vliw_tb/dut/ixu_2 -radix hexadecimal /vliw_tb/dut/ixu_
 add wave -noupdate -group vliw_tb/dut/lsu_instance
 add wave -noupdate -group vliw_tb/dut/lsu_instance -radix hexadecimal /vliw_tb/dut/lsu_instance/*
 
+# add lsu writeback signals
+add wave -noupdate -group vliw_tb/dut/lsu_instance/lsu_writeback_instance
+add wave -noupdate -group vliw_tb/dut/lsu_instance/lsu_writeback_instance -radix hexadecimal /vliw_tb/dut/lsu_instance/lsu_writeback_instance/*
+
 # add branch
 add wave -noupdate -group vliw_tb/dut/bru
 add wave -noupdate -group vliw_tb/dut/bru -radix hexadecimal /vliw_tb/dut/bru/*
@@ -43,6 +51,10 @@ add wave -noupdate -group vliw_tb/dut/bru -radix hexadecimal /vliw_tb/dut/bru/*
 # add forwarding unit
 add wave -noupdate -group vliw_tb/dut/fwu
 add wave -noupdate -group vliw_tb/dut/fwu -radix hexadecimal /vliw_tb/dut/fwu/*
+
+# add hazard detection
+add wave -noupdate -group vliw_tb/dut/hzd
+add wave -noupdate -group vliw_tb/dut/hzd -radix hexadecimal /vliw_tb/dut/hzd/*
 
 # add memory array
 add wave -noupdate -group vliw_tb/dut/ram/mem

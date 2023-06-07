@@ -35,11 +35,11 @@ logic [8*100:1] line;
 logic [31:0] dbuf;
 
 // Define the memory array
-logic [31:0] mem [31:0][1:0];
+logic [31:0] mem [35:0][1:0];
 
 // Write to the memory array when write_en is high
 always_ff @(posedge clk) begin
-    if (wr_en) mem[wr_addr][1] <= wr_data;
+    if (wr_en) mem[wr_addr / 4][1] <= wr_data;
 end
 
 // Read from the memory array

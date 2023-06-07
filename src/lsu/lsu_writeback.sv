@@ -4,7 +4,6 @@ module lsu_writeback
 (
     input   logic           is_nop,
     input   logic           is_load,
-    input   logic [4:0]     rd, // dest reg
     input   logic [31:0]    data_in, // data from memory
     input   logic [1:0]     size, // byte, half-word, word
     input   logic           zero_ext, // unsigned op

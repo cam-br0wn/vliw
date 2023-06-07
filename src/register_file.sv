@@ -40,7 +40,7 @@ module register_file (
 );
 
   // 32x 32b registers
-  logic [4:0] regs [31:0];
+  logic [31:0] regs [31:0];
 
   // logic no_dest_reg_overlap = (lsu_rd == ixu1_rd || (lsu_rd == ixu2_rd || ixu1_rd == ixu2_rd)) ? '0 : '1;
 
@@ -49,7 +49,7 @@ module register_file (
     regs[0] <= '0;
 
     if (rst == 1'b1) begin
-      for (int i = 0; i < 31; i = i+1) begin
+      for (int i = 0; i < 32; i = i+1) begin
         regs[i] <= '0;
       end
     end

@@ -22,7 +22,7 @@ module lsu
     output  logic [31:0]    rd_addr,    // address to read from
     output  logic           rd_en,      // read enable
     // data to be written to reg file
-    input   logic [31:0]    data_out,   
+    output  logic [31:0]    data_out,   
     // register to store data in on loads
     output  logic [4:0]     rd_out,
     // register file write enable
@@ -162,7 +162,6 @@ lsu_ex_wb lsu_ex_wb_register (
 lsu_writeback lsu_writeback_instance (
     .is_nop(exwb_is_nop),
     .is_load(exwb_is_load),
-    .rd(exwb_rd),
     .data_in(rd_data),
     .size(exwb_size),
     .zero_ext(exwb_zero_ext),
@@ -171,5 +170,6 @@ lsu_writeback lsu_writeback_instance (
 );
 
 assign wb_is_load = exwb_is_load;
+assign rd_out = exwb_rd;
 
 endmodule
