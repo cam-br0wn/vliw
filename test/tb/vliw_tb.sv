@@ -4,7 +4,7 @@ module vliw_tb;
 
 logic clk;
 logic rst;
-parameter test_file = "test/bin/test1.hex";
+parameter test_file = "test/bin/test_fwd.hex";
 
 vliw #(test_file)
 dut (
@@ -22,9 +22,9 @@ initial begin
     rst = '0; 
     #1;
     rst = '1;
-    #19;
+    #18;
     rst = '0;
-    #300;
+    #281;
     $stop;
 end
 

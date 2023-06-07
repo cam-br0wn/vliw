@@ -120,6 +120,7 @@ lsu_execute lsu_execute_instance (
     .is_nop(idex_is_nop),
     .is_rs1_fwd(is_rs1_fwd),
     .is_rs2_fwd(is_rs2_fwd),
+    .size(idex_size),
     .rs1_fwd_data(rs1_fwd_data),
     .rs2_fwd_data(rs2_fwd_data),
     .imm(idex_imm),
@@ -160,6 +161,7 @@ lsu_ex_wb lsu_ex_wb_register (
 );
 
 lsu_writeback lsu_writeback_instance (
+    .rst(rst),
     .is_nop(exwb_is_nop),
     .is_load(exwb_is_load),
     .data_in(rd_data),

@@ -11,6 +11,7 @@ module lsu_execute
     input   logic           is_nop,
     input   logic           is_rs1_fwd,
     input   logic           is_rs2_fwd,
+    input   logic [1:0]     size,
     input   logic [31:0]    rs1_fwd_data,
     input   logic [31:0]    rs2_fwd_data,
     input   logic [11:0]    imm,

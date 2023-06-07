@@ -1,6 +1,7 @@
 // writeback stage for integer ops
 module ixu_writeback
 (
+    input   logic           rst,
     input   logic           is_nop,
     input   logic [4:0]     rd,
     input   logic [31:0]    data_in,
@@ -11,7 +12,7 @@ module ixu_writeback
 
 always_comb begin
 
-    if (is_nop) begin
+    if (is_nop || rst) begin
         rd_out = '0;
         data_out = '0;
         wr_en = '0;

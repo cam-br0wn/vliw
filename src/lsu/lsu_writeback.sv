@@ -2,6 +2,7 @@
 // for stores, this module does nothing 
 module lsu_writeback
 (
+    input   logic           rst,
     input   logic           is_nop,
     input   logic           is_load,
     input   logic [31:0]    data_in, // data from memory
@@ -12,8 +13,8 @@ module lsu_writeback
 );
 
 always_comb begin
-    // NOP or store
-    if (is_nop == 1'b1 || is_load == 1'b0) begin
+    // NOP, store or rst
+    if ((rst || is_nop) || ~is_load) begin
         data_out = '0;
         wr_en = '0;
     end

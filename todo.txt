@@ -3,3 +3,8 @@ To-do list:
     - accessing memory with PC x will take a cycle to hit pipeline
     - branch unit needs this PC, but not too early
 - implement stalling when loads happen
+- implement variable size stores (might need to modify way mem is read)
+- test branching
+- test hazards
+- test stalling
+- test all ALU ops

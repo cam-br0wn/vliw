@@ -125,6 +125,7 @@ ixu_ex_wb ixu_ex_wb_reg (
 );
 
 ixu_writeback ixu_writeback_instance (
+    .rst(rst),
     .is_nop(exwb_is_nop),
     .rd(exwb_rd),
     .data_in(exwb_data),

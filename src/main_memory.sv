@@ -34,8 +34,10 @@ logic [31:0] data_value;
 logic [8*100:1] line;
 logic [31:0] dbuf;
 
+localparam NUM_WORDS = 36;
+
 // Define the memory array
-logic [31:0] mem [35:0][1:0];
+logic [31:0] mem [0:NUM_WORDS-1][0:1];
 
 // Write to the memory array when write_en is high
 always_ff @(posedge clk) begin
@@ -51,7 +53,7 @@ assign inst_bundle_out = {mem[pc_in / 4][1], mem[(pc_in + 4) / 4][1], mem[(pc_in
 
 task reset;
     begin
-    for(int i = 0; i < 32; i++) begin
+    for(int i = 0; i < NUM_WORDS; i++) begin
         mem[i][0] <= '0;
         mem[i][1] <= '0;
     end
