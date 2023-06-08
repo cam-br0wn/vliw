@@ -8,8 +8,11 @@ module main_memory #(
     input   logic [31:0]  wr_addr,
     input   logic [31:0]  wr_data,
     input   logic         wr_en,
+    input   logic [1:0]   wr_size,
     input   logic [31:0]  rd_addr,
     input   logic         rd_en,
+    input   logic [1:0]   rd_size,
+    input   logic         rd_zero_ext,
     output  logic [31:0]  data_out,
     // ports for inst fetch
     input   logic [31:0]  pc_in,
@@ -34,19 +37,159 @@ logic [31:0] data_value;
 logic [8*100:1] line;
 logic [31:0] dbuf;
 
-localparam NUM_WORDS = 36;
+localparam NUM_WORDS = 128;
+logic [31:0] internal_wr_addr;
+logic [31:0] internal_rd_addr;
+
+assign internal_wr_addr = $signed(wr_addr) >>> 2;
+assign internal_rd_addr = $signed(rd_addr) >>> 2;
 
 // Define the memory array
 logic [31:0] mem [0:NUM_WORDS-1][0:1];
 
-// Write to the memory array when write_en is high
+// store operations
 always_ff @(posedge clk) begin
-    if (wr_en) mem[wr_addr / 4][1] <= wr_data;
+    if (wr_en) begin
+        // byte operation
+        if (wr_size == 2'h0) begin
+            if (wr_addr[1:0] == 2'h0) begin
+                mem[internal_wr_addr][1] <= {mem[internal_wr_addr][1][31:8], wr_data[7:0]};
+            end
+            else if (wr_addr[1:0] == 2'h1) begin
+                mem[internal_wr_addr][1] <= {mem[internal_wr_addr][1][31:16], wr_data[7:0], mem[internal_wr_addr][1][7:0]};
+            end
+            else if (wr_addr[1:0] == 2'h2) begin
+                mem[internal_wr_addr][1] <= {mem[internal_wr_addr][1][31:24], wr_data[7:0], mem[internal_wr_addr][1][15:0]};
+            end
+            else begin
+                mem[internal_wr_addr][1] <= {wr_data[7:0], mem[internal_wr_addr][1][23:0]};
+            end
+        end
+        // half-word
+        else if (wr_size == 2'h1) begin
+            if (wr_addr[1:0] == 2'h0) begin
+                mem[internal_wr_addr][1] <= {mem[internal_wr_addr][1][31:16], wr_data[15:0]};
+            end
+            else if (wr_addr[1:0] == 2'h1) begin
+                mem[internal_wr_addr][1] <= {mem[internal_wr_addr][1][31:24], wr_data[15:0], mem[internal_wr_addr][1][7:0]};
+            end
+            else if (wr_addr[1:0] == 2'h2) begin
+                mem[internal_wr_addr][1] <= {wr_data[15:0], mem[internal_wr_addr][1][15:0]};
+            end
+            else begin
+                mem[internal_wr_addr][1] <= {wr_data[7:0], mem[internal_wr_addr][1][23:0]};
+                mem[internal_wr_addr + 1][1] <= {mem[internal_wr_addr + 1][1][31:8], wr_data[15:8]};
+            end
+        end 
+        // word
+        else if (wr_size == 2'h2) begin
+            if (wr_addr[1:0] == 2'h0) begin
+                mem[internal_wr_addr][1] <= wr_data;
+            end
+            else if (wr_addr[1:0] == 2'h1) begin
+                mem[internal_wr_addr][1] <= {wr_data[23:0], mem[internal_wr_addr][1][7:0]};
+                mem[internal_wr_addr + 1][1] <= {mem[internal_wr_addr + 1][1][31:8], wr_data[31:24]};
+            end
+            else if (wr_addr[1:0] == 2'h2) begin
+                mem[internal_wr_addr][1] <= {wr_data[15:0], mem[internal_wr_addr][1][15:0]};
+                mem[internal_wr_addr + 1][1] <= {mem[internal_wr_addr + 1][1][31:16], wr_data[31:16]};
+            end
+            else begin
+                mem[internal_wr_addr][1] <= {wr_data[7:0], mem[internal_wr_addr][1][23:0]};
+                mem[internal_wr_addr + 1][1] <= {mem[internal_wr_addr + 1][1][31:24], wr_data[31:8]};
+            end
+        end
+        else begin
+            $error("RAM ERROR: could not determine size of store");
+        end
+    end
 end
 
-// Read from the memory array
+// load operations
 always_ff @(posedge clk) begin
-    if (rd_en) data_out <= mem[rd_addr / 4][1];
+    if (rd_en) begin
+        // byte operation
+        if (rd_size == 2'h0) begin
+            // unsigned load
+            if (rd_zero_ext) begin
+                if (rd_addr[1:0] == 2'h0) begin
+                    data_out <= {24'h0, mem[internal_rd_addr][1][7:0]};
+                end
+                else if (rd_addr[1:0] == 2'h1) begin
+                    data_out <= {24'h0, mem[internal_rd_addr][1][15:8]};
+                end
+                else if (rd_addr[1:0] == 2'h2) begin
+                    data_out <= {24'h0, mem[internal_rd_addr][1][23:16]};
+                end
+                else begin
+                    data_out <= {24'h0, mem[internal_rd_addr][1][31:24]};
+                end
+            end
+            else begin
+                if (rd_addr[1:0] == 2'h0) begin
+                    data_out <= {{24{mem[internal_rd_addr][1][7]}}, mem[internal_rd_addr][1][7:0]};
+                end
+                else if (rd_addr[1:0] == 2'h1) begin
+                    data_out <= {{24{mem[internal_rd_addr][1][15]}}, mem[internal_rd_addr][1][15:8]};
+                end
+                else if (rd_addr[1:0] == 2'h2) begin
+                    data_out <= {{24{mem[internal_rd_addr][1][23]}}, mem[internal_rd_addr][1][23:16]};
+                end
+                else begin
+                    data_out <= {{24{mem[internal_rd_addr][1][31]}}, mem[internal_rd_addr][1][31:24]};
+                end
+            end
+        end
+        // half-word
+        else if (rd_size == 2'h1) begin
+            // unsigned load
+            if (rd_zero_ext) begin
+                if (rd_addr[1:0] == 2'h0) begin
+                    data_out <= {16'h0, mem[internal_rd_addr][1][15:0]};
+                end
+                else if (rd_addr[1:0] == 2'h1) begin
+                    data_out <= {16'h0, mem[internal_rd_addr][1][23:8]};
+                end
+                else if (rd_addr[1:0] == 2'h2) begin
+                    data_out <= {16'h0, mem[internal_rd_addr][1][31:16]};
+                end
+                else begin
+                    data_out <= {16'h0, mem[internal_rd_addr + 1][1][7:0], mem[internal_rd_addr][1][31:24]};
+                end
+            end
+            else begin
+                if (rd_addr[1:0] == 2'h0) begin
+                    data_out <= {{16{mem[internal_rd_addr][1][7]}}, mem[internal_rd_addr][1][15:0]};
+                end
+                else if (rd_addr[1:0] == 2'h1) begin
+                    data_out <= {{16{mem[internal_rd_addr][1][15]}}, mem[internal_rd_addr][1][23:8]};
+                end
+                else if (rd_addr[1:0] == 2'h2) begin
+                    data_out <= {{16{mem[internal_rd_addr][1][23]}}, mem[internal_rd_addr][1][31:16]};
+                end
+                else begin
+                    data_out <= {{16{mem[internal_rd_addr + 1][1][7]}}, mem[internal_rd_addr + 1][1][7:0], mem[internal_rd_addr][1][31:24]};
+                end
+            end
+        end
+        else if (rd_size == 2'h2) begin
+            if (rd_addr[1:0] == 2'h0) begin
+                data_out <= mem[internal_rd_addr][1];
+            end
+            else if (rd_addr[1:0] == 2'h1) begin
+                data_out <= {mem[internal_rd_addr + 1][1][7:0], mem[internal_rd_addr][1][31:8]};
+            end
+            else if (rd_addr[1:0] == 2'h2) begin
+                data_out <= {mem[internal_rd_addr + 1][1][15:0], mem[internal_rd_addr][1][31:16]};
+            end
+            else begin
+                data_out <= {mem[internal_rd_addr + 1][1][23:0], mem[internal_rd_addr][1][31:24]};
+            end
+        end
+        else begin
+            $error("RAM ERROR: Invalid size provided for load operation");
+        end
+    end
 end
 
 assign inst_bundle_out = {mem[pc_in / 4][1], mem[(pc_in + 4) / 4][1], mem[(pc_in + 8) / 4][1], mem[(pc_in + 12) / 4][1]};

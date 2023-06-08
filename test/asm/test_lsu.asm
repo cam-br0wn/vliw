@@ -10,22 +10,33 @@ nop
 
 nop
 nop
-sb x4,  0(x2)
+lhu x5, 4(x2)
 nop
 
 nop
 nop
-sh x4, 4(x2)
+lhu x6, 5(x2)
 nop
 
 nop
 nop
-sw x4, -4(x2)
+lhu x7, 6(x2)
 nop
 
 nop
 nop
-nop
+lhu x8, 7(x2)
 nop
 
-
+.DATA
+7
+0
+0
+0
+0
+0
+babecafe
+deadbeef
+d00dface
+0
+0

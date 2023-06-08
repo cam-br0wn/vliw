@@ -4,7 +4,7 @@ module vliw_tb;
 
 logic clk;
 logic rst;
-parameter test_file = "test/bin/test_fwd.hex";
+parameter test_file = "test/bin/test_alu_imm_ops.hex";
 
 vliw #(test_file)
 dut (

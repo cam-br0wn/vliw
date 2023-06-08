@@ -33,7 +33,7 @@ always_comb begin
         rs2 = '0;
         rd = inst[11:7];
         imm = inst[31:20];
-        is_nop = 1'b0;
+        is_nop = '0;
         is_load = '1;
         zero_ext = (funct3 == 3'h4) || (funct3 == 3'h5);
         
@@ -48,11 +48,12 @@ always_comb begin
             size = 2'h2;
         end
     end
+    // it is a store
     else if (opcode == 7'b0100011) begin
         rs1 = inst[19:15];
         rs2 = inst[24:20];
         rd = '0;
-        imm = {{5{inst[31]}}, inst[31:25]};
+        imm = {inst[31:25], inst[11:7]};
         is_nop = '0;
         is_load = '0;
         zero_ext = '0;
@@ -67,7 +68,6 @@ always_comb begin
             size = 2'h2;
         end
     end
-        // NOTE: we don't calculate the load/store address at this stage, that's done in execution stage
     // if it is a NOP, continue but don't float signals
     else if (inst == 32'h00000000) begin
         is_nop = '1;

@@ -58,13 +58,13 @@ always_comb begin
         out = (is_imm_type) ? X >> Y[4:0] : X >> Y;
     // SRA or SRAI
     end else if ( op == 4'h7 ) begin
-        out = (is_imm_type) ? X >>> Y[4:0] : X >>> Y; // this one probably doesn't work cuz >>> operator sucks
+        out = (is_imm_type) ? $signed(X) >>> Y[4:0] : $signed(X) >>> Y;
     // SLT or SLTI
     end else if ( op == 4'h8 ) begin
         out = ($signed(X) < $signed(Y)) ? 32'h1 : 32'h0;
     // SLTU or SLTUI
     end else if ( op == 4'h9 ) begin
-        out = (is_imm_type) ? (($unsigned(X) < $unsigned({{20{1'b0}}, Y[11:0]})) ? 32'h1 : 32'h0) : (($unsigned(X) < $unsigned(Y)) ? 32'h1 : 32'h0);
+        out = ($unsigned(X) < $unsigned(Y)) ? 32'h1 : 32'h0;
     // otherwise invalid opcode
     end else begin
         $error("IXU ALU ERROR: invalid op bits in ALU");

@@ -17,10 +17,13 @@ module lsu
     output  logic [31:0]    wr_addr,
     output  logic [31:0]    wr_data,
     output  logic           wr_en,
+    output  logic [1:0]     wr_size,
     // read addr for loads
     input   logic [31:0]    rd_data,    // data coming back from ram
     output  logic [31:0]    rd_addr,    // address to read from
     output  logic           rd_en,      // read enable
+    output  logic [1:0]     rd_size,
+    output  logic           rd_zero_ext,
     // data to be written to reg file
     output  logic [31:0]    data_out,   
     // register to store data in on loads
@@ -114,6 +117,7 @@ lsu_id_ex lsu_id_ex_register (
 // connect to register file ports
 assign rs1_out = idex_rs1;
 assign rs2_out = idex_rs2;
+assign rd_zero_ext = idex_zero_ext;
 
 lsu_execute lsu_execute_instance (
     .is_load(idex_is_load),
@@ -129,8 +133,10 @@ lsu_execute lsu_execute_instance (
     .wr_addr(wr_addr),
     .wr_data(wr_data),
     .wr_en(wr_en),
+    .wr_size(wr_size),
     .rd_addr(rd_addr),
-    .rd_en(rd_en)
+    .rd_en(rd_en),
+    .rd_size(rd_size)
 );
 
 assign ex_is_load = idex_is_load;

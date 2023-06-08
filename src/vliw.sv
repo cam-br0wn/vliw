@@ -57,9 +57,12 @@ logic [31:0]    bru_new_pc_out;
 logic [31:0]    lsu_wr_addr;
 logic [31:0]    lsu_wr_data;
 logic           lsu_wr_en;
+logic [1:0]     lsu_wr_size;
 logic [31:0]    lsu_rd_addr;
 logic           lsu_rd_en;
 logic [31:0]    lsu_rd_data;
+logic [1:0]     lsu_rd_size;
+logic           lsu_rd_zero_ext;
 
 
 //// instruction fetch to/from memory signals ////
@@ -190,10 +193,13 @@ lsu lsu_instance
     .wr_addr(lsu_wr_addr),
     .wr_data(lsu_wr_data),
     .wr_en(lsu_wr_en),
+    .wr_size(lsu_wr_size),
 
     .rd_data(lsu_rd_data),  // data from MEM -> LSU
     .rd_addr(lsu_rd_addr),
     .rd_en(lsu_rd_en),
+    .rd_size(lsu_rd_size),
+    .rd_zero_ext(lsu_rd_zero_ext),
 
     .data_out(lsu_data_out), // data from LSU -> reg file
     .rd_out(lsu_rd_out),
@@ -291,8 +297,11 @@ main_memory #(
     .wr_addr(lsu_wr_addr),
     .wr_data(lsu_wr_data),
     .wr_en(lsu_wr_en),
+    .wr_size(lsu_wr_size),
     .rd_addr(lsu_rd_addr),
     .rd_en(lsu_rd_en),
+    .rd_size(lsu_rd_size),
+    .rd_zero_ext(lsu_rd_zero_ext),
     .data_out(lsu_rd_data),
     // instruction fetch ports
     .pc_in(fetch_pc),
