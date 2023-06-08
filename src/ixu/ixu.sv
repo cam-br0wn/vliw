@@ -28,6 +28,9 @@ module ixu
     output  logic [4:0]     dc_rs1,
     output  logic [4:0]     dc_rs2,
 
+    // need to tell fwd unit if wb is a nop
+    output  logic           wb_nop,
+
     // squash from PC after branch taken
     input   logic           branch_squash
 );
@@ -44,7 +47,7 @@ logic [11:0]    decode_imm;
 assign dc_rs1 = decode_rs1;
 assign dc_rs2 = decode_rs2;
 
-ixu_decode ixu_decode_instance (
+ixu_decode decode (
     .inst(inst),
     .op(decode_op),
     .is_nop(decode_is_nop),
@@ -65,7 +68,7 @@ logic [11:0]    idex_imm;
 logic           decode_nop_or_squash;
 assign decode_nop_or_squash = decode_is_nop || branch_squash;
 
-ixu_id_ex ixu_id_ex_reg (
+ixu_id_ex idex (
     .clk(clk),
     .rst(rst),
     .stall(stall),
@@ -88,7 +91,7 @@ ixu_id_ex ixu_id_ex_reg (
 // execution stage internal signals
 logic [31:0]    execute_data;
 
-ixu_execute ixu_execute_instance (
+ixu_execute exec (
     .is_rs1_fwd(is_rs1_fwd),
     .is_rs2_fwd(is_rs2_fwd),
     .rs1_fwd_data(rs1_fwd_data),
@@ -110,9 +113,7 @@ logic [31:0]    exwb_data;
 logic           exec_nop_or_squash;
 assign exec_nop_or_squash = idex_is_nop || branch_squash;
 
-assign wb_rd_out = exwb_rd;
-
-ixu_ex_wb ixu_ex_wb_reg (
+ixu_ex_wb exwb (
     .clk(clk),
     .rst(rst),
     .stall(stall),
@@ -124,7 +125,10 @@ ixu_ex_wb ixu_ex_wb_reg (
     .data_out(exwb_data)
 );
 
-ixu_writeback ixu_writeback_instance (
+assign wb_rd_out = exwb_rd;
+assign wb_nop = exwb_is_nop;
+
+ixu_writeback wb (
     .rst(rst),
     .is_nop(exwb_is_nop),
     .rd(exwb_rd),

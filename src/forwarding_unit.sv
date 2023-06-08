@@ -13,6 +13,11 @@ module forwarding_unit
     input   logic [31:0]        ixu2_wb_data,
     input   logic [31:0]        lsu_wb_data,
 
+    // if they're nops, don't want to forward
+    input   logic               ixu1_wb_nop,
+    input   logic               ixu2_wb_nop,
+    input   logic               lsu_wb_nop,
+
     // execute source registers
     input   logic [4:0]         ixu1_ex_rs1,
     input   logic [4:0]         ixu1_ex_rs2,
@@ -47,15 +52,15 @@ module forwarding_unit
 
 // IXU1 RS1
 always_comb begin
-    if ((ixu1_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((ixu1_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         ixu1_rs1_fwd = '1;
         ixu1_rs1_fwd_data = ixu1_wb_data;
     end
-    else if ((ixu1_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((ixu1_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         ixu1_rs1_fwd = '1;
         ixu1_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu1_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((ixu1_ex_rs1 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu1_rs1_fwd = '1;
         ixu1_rs1_fwd_data = lsu_wb_data;
     end
@@ -67,15 +72,15 @@ end
 
 // IXU1 RS2
 always_comb begin
-    if ((ixu1_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((ixu1_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         ixu1_rs2_fwd = '1;
         ixu1_rs2_fwd_data = ixu1_wb_data;
     end
-    else if ((ixu1_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((ixu1_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         ixu1_rs2_fwd = '1;
         ixu1_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu1_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((ixu1_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu1_rs2_fwd = '1;
         ixu1_rs2_fwd_data = lsu_wb_data;
     end
@@ -87,15 +92,15 @@ end
 
 // IXU2 RS1
 always_comb begin
-    if ((ixu2_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((ixu2_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         ixu2_rs1_fwd = '1;
         ixu2_rs1_fwd_data = ixu1_wb_data;
     end
-    else if ((ixu2_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((ixu2_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         ixu2_rs1_fwd = '1;
         ixu2_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu2_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((ixu2_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu2_rs1_fwd = '1;
         ixu2_rs1_fwd_data = lsu_wb_data;
     end
@@ -107,15 +112,15 @@ end
 
 // IXU2 RS2
 always_comb begin
-    if ((ixu2_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((ixu2_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         ixu2_rs2_fwd = '1;
         ixu2_rs2_fwd_data = ixu1_wb_data;
     end
-    else if ((ixu2_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((ixu2_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         ixu2_rs2_fwd = '1;
         ixu2_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu2_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((ixu2_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu2_rs2_fwd = '1;
         ixu2_rs2_fwd_data = lsu_wb_data;
     end
@@ -127,15 +132,15 @@ end
 
 // LSU RS1
 always_comb begin
-    if ((lsu_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((lsu_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         lsu_rs1_fwd = '1;
         lsu_rs1_fwd_data = ixu1_wb_data;
     end
-    else if ((lsu_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((lsu_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         lsu_rs1_fwd = '1;
         lsu_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((lsu_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((lsu_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         lsu_rs1_fwd = '1;
         lsu_rs1_fwd_data = lsu_wb_data;
     end
@@ -147,15 +152,15 @@ end
 
 // LSU RS2
 always_comb begin
-    if ((lsu_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((lsu_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         lsu_rs2_fwd = '1;
         lsu_rs2_fwd_data = ixu1_wb_data;
     end
-    else if ((lsu_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((lsu_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         lsu_rs2_fwd = '1;
         lsu_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((lsu_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((lsu_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         lsu_rs2_fwd = '1;
         lsu_rs2_fwd_data = lsu_wb_data;
     end
@@ -167,15 +172,15 @@ end
 
 // Branch RS1
 always_comb begin
-    if ((branch_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((branch_ex_rs1 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         branch_rs1_fwd = '1;
         branch_rs1_fwd_data = ixu1_wb_data;
     end
-    else if ((branch_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((branch_ex_rs1 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         branch_rs1_fwd = '1;
         branch_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((branch_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((branch_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         branch_rs1_fwd = '1;
         branch_rs1_fwd_data = lsu_wb_data;
     end
@@ -187,15 +192,15 @@ end
 
 // Branch RS2
 always_comb begin
-    if ((branch_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0)) begin
+    if ((branch_ex_rs2 == ixu1_wb_rd) && (ixu1_wb_rd != '0) && ~ixu1_wb_nop) begin
         branch_rs2_fwd = '1;
         branch_rs2_fwd_data = ixu1_wb_data;
     end
-    else if ((branch_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0)) begin
+    else if ((branch_ex_rs2 == ixu2_wb_rd) && (ixu2_wb_rd != '0) && ~ixu2_wb_nop) begin
         branch_rs2_fwd = '1;
         branch_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((branch_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0)) begin
+    else if ((branch_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         branch_rs2_fwd = '1;
         branch_rs2_fwd_data = lsu_wb_data;
     end

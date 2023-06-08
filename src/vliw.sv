@@ -86,6 +86,7 @@ logic           ixu1_is_rs2_fwd;
 logic [31:0]    ixu1_rs1_fwd_data;
 logic [31:0]    ixu1_rs2_fwd_data;
 logic [4:0]     ixu1_wb_rd;
+logic           ixu_wb_nop;
 
 // IXU 2
 logic           ixu2_is_rs1_fwd;
@@ -93,6 +94,7 @@ logic           ixu2_is_rs2_fwd;
 logic [31:0]    ixu2_rs1_fwd_data;
 logic [31:0]    ixu2_rs2_fwd_data;
 logic [4:0]     ixu2_wb_rd;
+logic           ixu2_wb_nop;
 
 // LSU
 logic           lsu_is_rs1_fwd;
@@ -101,6 +103,7 @@ logic [31:0]    lsu_rs1_fwd_data;
 logic [31:0]    lsu_rs2_fwd_data;
 logic [4:0]     lsu_wb_rd;
 logic           lsu_wb_is_load;
+logic           lsu_wb_nop;
 
 // BRANCH
 logic           bru_is_rs1_fwd;
@@ -148,6 +151,7 @@ ixu ixu_1
     .rs2_fwd_data(ixu1_rs2_fwd_data),
     .dc_rs1(ixu1_dc_rs1),
     .dc_rs2(ixu1_dc_rs2),
+    .wb_nop(ixu1_wb_nop),
     .branch_squash(pc_squash_out)
 );
 
@@ -172,11 +176,12 @@ ixu ixu_2
     .rs2_fwd_data(ixu2_rs2_fwd_data),
     .dc_rs1(ixu2_dc_rs1),
     .dc_rs2(ixu2_dc_rs2),
+    .wb_nop(ixu2_wb_nop),
     .branch_squash(pc_squash_out)
 );
 
 // LSU
-lsu lsu_instance
+lsu lsu_i
 (
     .clk(clk),
     .rst(rst),
@@ -214,6 +219,7 @@ lsu lsu_instance
     .wb_rd_out(lsu_wb_rd),
     .dc_rs1(lsu_dc_rs1),
     .dc_rs2(lsu_dc_rs2),
+    .wb_nop(lsu_wb_nop),
     .branch_squash(pc_squash_out)
 );
 
@@ -224,7 +230,7 @@ branch bru
     .rst(rst),
     .stall(haz_det_stall),
     .inst(bru_inst),
-    .inst_pc(),
+    .inst_pc(fetch_pc),
     .rs1_out(bru_rs1_out),
     .rs2_out(bru_rs2_out),
     .rs1_data(bru_rs1_data),
@@ -351,6 +357,11 @@ forwarding_unit fwu
     .ixu1_wb_data(ixu1_data_out),
     .ixu2_wb_data(ixu2_data_out),
     .lsu_wb_data(lsu_data_out),
+
+    // writeback are nops?
+    .ixu1_wb_nop(ixu1_wb_nop),
+    .ixu2_wb_nop(ixu2_wb_nop),
+    .lsu_wb_nop(lsu_wb_nop),
 
     // execute source registers
     .ixu1_ex_rs1(ixu1_rs1_out),

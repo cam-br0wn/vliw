@@ -324,6 +324,10 @@ def parse(line):
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
         imm = int_to_bin(int(line_arr[3]), 12)
+        # have to divide by 16 via a sign-ext bit shift
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
+        # SV: 12 11 10 09 08 07 06 05 04 03 02 01
+        # py: 00 01 02 03 04 05 06 07 08 09 10 11
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -334,6 +338,8 @@ def parse(line):
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
         imm = int_to_bin(int(line_arr[3]), 12)
+        # have to divide by 16 via a sign-ext bit shift
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -344,6 +350,8 @@ def parse(line):
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
         imm = int_to_bin(int(line_arr[3]), 12)
+        # have to divide by 16 via a sign-ext bit shift
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -354,6 +362,8 @@ def parse(line):
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
         imm = int_to_bin(int(line_arr[3]), 12)
+        # have to divide by 16 via a sign-ext bit shift
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -364,6 +374,8 @@ def parse(line):
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
         imm = int_to_bin(int(line_arr[3]), 12)
+        # have to divide by 16 via a sign-ext bit shift
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -374,6 +386,8 @@ def parse(line):
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
         imm = int_to_bin(int(line_arr[3]), 12)
+        # have to divide by 16 via a sign-ext bit shift
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -382,6 +396,7 @@ def parse(line):
         opcode = '1101111'
         rd = int_to_bin(int(line_arr[1]), 5)
         imm = int_to_bin(int(line_arr[2]), 20)
+        imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:16]
         bits = imm[0] + imm[10:20] + imm[9] + imm[1:9] + rd + opcode
         # SV: 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01
         # py: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19

@@ -4,7 +4,7 @@ To-do list:
     - branch unit needs this PC, but not too early
 - implement stalling when loads happen
 - implement variable size stores (might need to modify way mem is read)
+- fix branch length sign extension (branch imm length is different from jal)
 - test branching
 - test hazards
 - test stalling
-- test all ALU ops

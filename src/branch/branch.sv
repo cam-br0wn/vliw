@@ -45,12 +45,12 @@ logic [1:0]     decode_op;
 logic [4:0]     decode_rs1;
 logic [4:0]     decode_rs2;
 logic [4:0]     decode_rd;
-logic [21:0]    decode_imm;
+logic [19:0]    decode_imm;
 
 assign dc_rs1 = decode_rs1;
 assign dc_rs2 = decode_rs2;
 
-branch_decode branch_decode_instance (
+branch_decode decode (
     .inst(inst),
     .is_nop(decode_is_nop),
     .is_jmp(decode_is_jmp),
@@ -69,13 +69,13 @@ logic           idex_is_jmp;
 logic           idex_is_imm_type;
 logic           idex_zero_ext;
 logic [1:0]     idex_op;
-logic [21:0]    idex_imm;
+logic [19:0]    idex_imm;
 logic [31:0]    idex_pc;
 // internal signal to or the decode is_nop with squash
 logic           decode_nop_or_squash;
 assign decode_nop_or_squash = decode_is_nop || branch_squash;
 
-branch_id_ex branch_id_ex_reg (
+branch_id_ex idex (
     .clk(clk),
     .rst(rst),
     .stall(stall),
@@ -101,7 +101,7 @@ branch_id_ex branch_id_ex_reg (
     .pc_out(idex_pc)
 );
 
-branch_execute branch_execute_instance (
+branch_execute exec (
     .is_nop(idex_is_nop),
     .zero_ext(idex_zero_ext),
     .is_jmp(idex_is_jmp),

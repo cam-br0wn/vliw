@@ -13,7 +13,7 @@ module branch_id_ex
     input   logic [4:0]     rs1_in,
     input   logic [4:0]     rs2_in,
     input   logic [4:0]     rd_in,
-    input   logic [21:0]    imm_in,
+    input   logic [19:0]    imm_in,
     input   logic [31:0]    pc_in,
     output  logic           is_nop_out,
     output  logic           is_jmp_out,
@@ -23,7 +23,7 @@ module branch_id_ex
     output  logic [4:0]     rs1_out,
     output  logic [4:0]     rs2_out,
     output  logic [4:0]     rd_out,
-    output  logic [21:0]    imm_out,
+    output  logic [19:0]    imm_out,
     output  logic [31:0]    pc_out
 );
 
@@ -39,6 +39,7 @@ always_ff @(posedge clk or posedge rst) begin
         rs2_out <= '0;
         rd_out <= '0;
         imm_out <= '0;
+        pc_out <= '0;
     end
 
     // if stall, preserve state
@@ -52,6 +53,7 @@ always_ff @(posedge clk or posedge rst) begin
         rs2_out <= rs2_out;
         rd_out <= rd_out;
         imm_out <= imm_out;
+        pc_out <= pc_out;
     end
 
     else begin
@@ -64,6 +66,7 @@ always_ff @(posedge clk or posedge rst) begin
         rs2_out <= rs2_in;
         rd_out <= rd_in;
         imm_out <= imm_in;
+        pc_out <= pc_in;
     end
 
 end

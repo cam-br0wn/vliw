@@ -46,6 +46,9 @@ module lsu
     output  logic [4:0]     dc_rs1,
     output  logic [4:0]     dc_rs2,
 
+    // need to tell fwd unit if wb is a nop
+    output  logic           wb_nop,
+
     // squash from PC after branch taken
     input   logic           branch_squash
 );
@@ -80,7 +83,7 @@ assign decode_nop_or_squash = decode_is_nop || branch_squash;
 logic           exec_nop_or_squash;
 assign exec_nop_or_squash = idex_is_nop || branch_squash;
 
-lsu_decode lsu_decode_instance (
+lsu_decode decode (
     .inst(inst),
     .is_load(decode_is_load),
     .zero_ext(decode_zero_ext),
@@ -92,7 +95,7 @@ lsu_decode lsu_decode_instance (
     .imm(decode_imm)
 );
 
-lsu_id_ex lsu_id_ex_register (
+lsu_id_ex idex (
     .clk(clk),
     .rst(rst),
     .stall(stall),
@@ -119,7 +122,7 @@ assign rs1_out = idex_rs1;
 assign rs2_out = idex_rs2;
 assign rd_zero_ext = idex_zero_ext;
 
-lsu_execute lsu_execute_instance (
+lsu_execute exec (
     .is_load(idex_is_load),
     .is_nop(idex_is_nop),
     .is_rs1_fwd(is_rs1_fwd),
@@ -149,8 +152,9 @@ logic [1:0]     exwb_size;
 logic [4:0]     exwb_rd;
 
 assign wb_rd_out = exwb_rd;
+assign wb_nop = exwb_is_nop;
 
-lsu_ex_wb lsu_ex_wb_register (
+lsu_ex_wb exwb (
     .clk(clk),
     .rst(rst),
     .stall(stall),
@@ -166,7 +170,7 @@ lsu_ex_wb lsu_ex_wb_register (
     .rd_out(exwb_rd)
 );
 
-lsu_writeback lsu_writeback_instance (
+lsu_writeback wb (
     .rst(rst),
     .is_nop(exwb_is_nop),
     .is_load(exwb_is_load),
