@@ -27,13 +27,6 @@ always_ff @(posedge clk or posedge rst) begin
         size_out <= '0;
         rd_out <= '0;
     end
-    else if (stall == 1'b1) begin
-        is_load_out <= is_load_out;
-        zero_ext_out <= zero_ext_out;
-        is_nop_out <= is_nop_out;
-        size_out <= size_out;
-        rd_out <= rd_out;
-    end
     else begin
         is_load_out <= is_load_in;
         zero_ext_out <= zero_ext_in;

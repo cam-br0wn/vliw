@@ -32,6 +32,7 @@ module lsu
     output  logic           reg_file_wr_en,
     // need to inform hazard detection if execute is a load
     output  logic           ex_is_load,
+    output  logic [4:0]     ex_rd,
     // need to inform forwarding unit if the writeback is a load
     output  logic           wb_is_load,
 
@@ -153,6 +154,7 @@ logic [4:0]     exwb_rd;
 
 assign wb_rd_out = exwb_rd;
 assign wb_nop = exwb_is_nop;
+assign ex_rd = idex_rd;
 
 lsu_ex_wb exwb (
     .clk(clk),

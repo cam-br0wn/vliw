@@ -22,16 +22,18 @@ module hazard_detection
 
 // RAW from loads portion
 always_comb begin
-    stall_out = (
-        ((ixu1_dc_rs1 == lsu_ex_rd) || 
-        (ixu1_dc_rs2 == lsu_ex_rd) || 
-        (ixu2_dc_rs1 == lsu_ex_rd) || 
-        (ixu2_dc_rs2 == lsu_ex_rd) || 
-        (lsu_dc_rs1 == lsu_ex_rd) || 
-        (lsu_dc_rs2 == lsu_ex_rd) ||
-        (bru_dc_rs1 == lsu_ex_rd) || 
-        (bru_dc_rs2 == lsu_ex_rd)) && (lsu_ex_is_load && (lsu_ex_rd != '0))
-    ) ? '1 : '0;
+    // stall_out = (
+    //     ((ixu1_dc_rs1 == lsu_ex_rd) || 
+    //     (ixu1_dc_rs2 == lsu_ex_rd) || 
+    //     (ixu2_dc_rs1 == lsu_ex_rd) || 
+    //     (ixu2_dc_rs2 == lsu_ex_rd) || 
+    //     (lsu_dc_rs1 == lsu_ex_rd) || 
+    //     (lsu_dc_rs2 == lsu_ex_rd) ||
+    //     (bru_dc_rs1 == lsu_ex_rd) || 
+    //     (bru_dc_rs2 == lsu_ex_rd)) && (lsu_ex_is_load && (lsu_ex_rd != '0))
+    // ) ? '1 : '0;
+    // no need for stalling right now since forwarding takes care of all of it
+    stall_out = '0;
 end
 
 endmodule

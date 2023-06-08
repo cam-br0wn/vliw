@@ -18,15 +18,26 @@ def int_to_bin(value, bit_width):
     format_string = '{:0' + str(bit_width) + 'b}'
     return format_string.format(value)
 
+def hex_to_bin(hex_str, length):
+    bin_str = ''
+    for i in range(len(hex_str)):
+        bin_str = bin_str + format(int(hex_str[i], 16), '04b')
+    return bin_str.zfill(length)
+
 def bin_to_hex(bin_str):
     return format(int(bin_str, 2), '08x')
 
 def parse(line):
     # remove the new-line and split on spaces
     line_arr = line[:len(line)-1].split(' ')
+    is_hex = [False] * len(line_arr)
     inst_str = line_arr[0].lower()
     for i in range(1, len(line_arr)):
-        line_arr[i] = line_arr[i].strip('x')
+        if (line_arr[i][0:2] == '0x'):
+            is_hex[i] = True
+            line_arr[i] = line_arr[i][2:]
+        else:
+            line_arr[i] = line_arr[i].strip('x')
     
     if inst_str == 'nop':
         bits = '00000000000000000000000000000000'
@@ -148,7 +159,10 @@ def parse(line):
         opcode = '0010011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -158,7 +172,10 @@ def parse(line):
         opcode = '0010011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -168,7 +185,10 @@ def parse(line):
         opcode = '0010011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -178,7 +198,10 @@ def parse(line):
         opcode = '0010011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -189,7 +212,10 @@ def parse(line):
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
         shtyp = '0000000'
-        shamt = int_to_bin(int(line_arr[3]), 5)
+        if is_hex[3]:
+            shamt = hex_to_bin(line_arr[3], 5)
+        else:
+            shamt = int_to_bin(int(line_arr[3]), 5)
         bits = shtyp + shamt + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -200,7 +226,10 @@ def parse(line):
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
         shtyp = '0000000'
-        shamt = int_to_bin(int(line_arr[3]), 5)
+        if is_hex[3]:
+            shamt = hex_to_bin(line_arr[3], 5)
+        else:
+            shamt = int_to_bin(int(line_arr[3]), 5)
         bits = shtyp + shamt + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -211,7 +240,10 @@ def parse(line):
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
         shtyp = '0100000'
-        shamt = int_to_bin(int(line_arr[3]), 5)
+        if is_hex[3]:
+            shamt = hex_to_bin(line_arr[3], 5)
+        else:
+            shamt = int_to_bin(int(line_arr[3]), 5)
         bits = shtyp + shamt + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -221,7 +253,10 @@ def parse(line):
         opcode = '0010011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -231,7 +266,10 @@ def parse(line):
         opcode = '0010011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -241,7 +279,10 @@ def parse(line):
         opcode = '0000011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -252,7 +293,10 @@ def parse(line):
         opcode = '0000011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -263,7 +307,10 @@ def parse(line):
         opcode = '0000011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -273,7 +320,10 @@ def parse(line):
         opcode = '0000011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -283,7 +333,10 @@ def parse(line):
         opcode = '0000011'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -293,7 +346,10 @@ def parse(line):
         opcode = '0100011'
         rs2 = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -303,7 +359,10 @@ def parse(line):
         opcode = '0100011'
         rs2 = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -313,7 +372,10 @@ def parse(line):
         opcode = '0100011'
         rs2 = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -323,7 +385,10 @@ def parse(line):
         opcode = '1100011'
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         # have to divide by 16 via a sign-ext bit shift
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         # SV: 12 11 10 09 08 07 06 05 04 03 02 01
@@ -337,7 +402,10 @@ def parse(line):
         opcode = '1100011'
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         # have to divide by 16 via a sign-ext bit shift
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
@@ -349,7 +417,10 @@ def parse(line):
         opcode = '1100011'
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         # have to divide by 16 via a sign-ext bit shift
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
@@ -361,7 +432,10 @@ def parse(line):
         opcode = '1100011'
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         # have to divide by 16 via a sign-ext bit shift
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
@@ -373,7 +447,10 @@ def parse(line):
         opcode = '1100011'
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         # have to divide by 16 via a sign-ext bit shift
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
@@ -385,7 +462,10 @@ def parse(line):
         opcode = '1100011'
         rs1 = int_to_bin(int(line_arr[1]), 5)
         rs2 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         # have to divide by 16 via a sign-ext bit shift
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:8]
         bits = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
@@ -395,7 +475,10 @@ def parse(line):
     elif inst_str == 'jal':
         opcode = '1101111'
         rd = int_to_bin(int(line_arr[1]), 5)
-        imm = int_to_bin(int(line_arr[2]), 20)
+        if is_hex[2]:
+            imm = hex_to_bin(line_arr[2], 20)
+        else:
+            imm = int_to_bin(int(line_arr[2]), 20)
         imm = imm[0] + imm[0] + imm[0] + imm[0] + imm[0:16]
         bits = imm[0] + imm[10:20] + imm[9] + imm[1:9] + rd + opcode
         # SV: 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01
@@ -408,7 +491,10 @@ def parse(line):
         opcode = '1100111'
         rd = int_to_bin(int(line_arr[1]), 5)
         rs1 = int_to_bin(int(line_arr[2]), 5)
-        imm = int_to_bin(int(line_arr[3]), 12)
+        if is_hex[3]:
+            imm = hex_to_bin(line_arr[3], 12)
+        else:
+            imm = int_to_bin(int(line_arr[3]), 12)
         bits = imm + rs1 + funct3 + rd + opcode
         assert len(bits) == 32
         return bin_to_hex(bits)
@@ -440,7 +526,10 @@ def main():
         if not data_section_entered:
             hex_file.write(format(mem_addr, '08x') + ' / ' + str(parse(line)) + ';\n')
         else:
-            hex_file.write(format(mem_addr, '08x') + ' / ' + line[:len(line)-1].zfill(8) + ';\n')
+            if line[0:2] == '0x':
+                hex_file.write(format(mem_addr, '08x') + ' / ' + line[2:len(line)-1].zfill(8) + ';\n')
+            else:
+                hex_file.write(format(mem_addr, '08x') + ' / ' + format(int(line[:len(line)-1]), '08x') + ';\n')
         mem_addr += 4
         mem_lines += 1
 

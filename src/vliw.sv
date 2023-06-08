@@ -122,6 +122,7 @@ logic [4:0]     ixu2_dc_rs2;
 // LSU
 logic [4:0]     lsu_dc_rs1;
 logic [4:0]     lsu_dc_rs2;
+logic [4:0]     lsu_ex_rd;
 logic           lsu_ex_is_load;
 // BRANCH
 logic [4:0]     bru_dc_rs1;
@@ -211,6 +212,7 @@ lsu lsu_i
     
     .reg_file_wr_en(lsu_reg_file_wr_en),
     .ex_is_load(lsu_ex_is_load),
+    .ex_rd(lsu_ex_rd),
     .wb_is_load(lsu_wb_is_load),
     .is_rs1_fwd(lsu_is_rs1_fwd),
     .is_rs2_fwd(lsu_is_rs2_fwd),
@@ -317,7 +319,7 @@ main_memory #(
 // Hazard detection unit
 hazard_detection hzd
 (
-    .lsu_ex_rd(lsu_rd_out),
+    .lsu_ex_rd(lsu_ex_rd),
     .lsu_ex_is_load(lsu_ex_is_load),
     // decode src regs
     .ixu1_dc_rs1(ixu1_dc_rs1),

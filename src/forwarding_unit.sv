@@ -60,10 +60,16 @@ always_comb begin
         ixu1_rs1_fwd = '1;
         ixu1_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu1_ex_rs1 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    // if memory latency is just 1 cycle, we can fwd loads
+    else if ((ixu1_ex_rs1 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu1_rs1_fwd = '1;
         ixu1_rs1_fwd_data = lsu_wb_data;
     end
+    // use this one otherwise
+    // else if ((ixu1_ex_rs1 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     ixu1_rs1_fwd = '1;
+    //     ixu1_rs1_fwd_data = lsu_wb_data;
+    // end
     else begin
         ixu1_rs1_fwd = '0;
         ixu1_rs1_fwd_data = '0;
@@ -80,10 +86,15 @@ always_comb begin
         ixu1_rs2_fwd = '1;
         ixu1_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu1_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((ixu1_ex_rs2 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu1_rs2_fwd = '1;
         ixu1_rs2_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1 cycle
+    // else if ((ixu1_ex_rs2 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     ixu1_rs2_fwd = '1;
+    //     ixu1_rs2_fwd_data = lsu_wb_data;
+    // end
     else begin
         ixu1_rs2_fwd = '0;
         ixu1_rs2_fwd_data = '0;
@@ -100,10 +111,15 @@ always_comb begin
         ixu2_rs1_fwd = '1;
         ixu2_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu2_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((ixu2_ex_rs1 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu2_rs1_fwd = '1;
         ixu2_rs1_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1 cycle
+    // else if ((ixu2_ex_rs1 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     ixu2_rs1_fwd = '1;
+    //     ixu2_rs1_fwd_data = lsu_wb_data;
+    // end
     else begin
         ixu2_rs1_fwd = '0;
         ixu2_rs1_fwd_data = '0;
@@ -120,10 +136,15 @@ always_comb begin
         ixu2_rs2_fwd = '1;
         ixu2_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((ixu2_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((ixu2_ex_rs2 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         ixu2_rs2_fwd = '1;
         ixu2_rs2_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1 cycle
+    // else if ((ixu2_ex_rs2 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     ixu2_rs2_fwd = '1;
+    //     ixu2_rs2_fwd_data = lsu_wb_data;
+    // end
     else begin
         ixu2_rs2_fwd = '0;
         ixu2_rs2_fwd_data = '0;
@@ -140,10 +161,15 @@ always_comb begin
         lsu_rs1_fwd = '1;
         lsu_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((lsu_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((lsu_ex_rs1 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         lsu_rs1_fwd = '1;
         lsu_rs1_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1 cycle
+    // else if ((lsu_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     lsu_rs1_fwd = '1;
+    //     lsu_rs1_fwd_data = lsu_wb_data;
+    // end
     else begin
         lsu_rs1_fwd = '0;
         lsu_rs1_fwd_data = '0;
@@ -160,10 +186,15 @@ always_comb begin
         lsu_rs2_fwd = '1;
         lsu_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((lsu_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((lsu_ex_rs2 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         lsu_rs2_fwd = '1;
         lsu_rs2_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1 cycle
+    // else if ((lsu_ex_rs2 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     lsu_rs2_fwd = '1;
+    //     lsu_rs2_fwd_data = lsu_wb_data;
+    // end
     else begin
         lsu_rs2_fwd = '0;
         lsu_rs2_fwd_data = '0;
@@ -180,10 +211,15 @@ always_comb begin
         branch_rs1_fwd = '1;
         branch_rs1_fwd_data = ixu2_wb_data;
     end
-    else if ((branch_ex_rs1 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((branch_ex_rs1 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         branch_rs1_fwd = '1;
         branch_rs1_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1 cycle
+    // else if ((branch_ex_rs1 == lsu_wb_rd) && ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     branch_rs1_fwd = '1;
+    //     branch_rs1_fwd_data = lsu_wb_data;
+    // end
     else begin
         branch_rs1_fwd = '0;
         branch_rs1_fwd_data = '0;
@@ -200,10 +236,15 @@ always_comb begin
         branch_rs2_fwd = '1;
         branch_rs2_fwd_data = ixu2_wb_data;
     end
-    else if ((branch_ex_rs2 == lsu_wb_rd) && (lsu_wb_is_load == 1'b0) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    else if ((branch_ex_rs2 == lsu_wb_rd) && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
         branch_rs2_fwd = '1;
         branch_rs2_fwd_data = lsu_wb_data;
     end
+    // use if mem latency > 1
+    // else if ((branch_ex_rs2 == lsu_wb_rd) ~lsu_wb_is_load && (lsu_wb_rd != '0) && ~lsu_wb_nop) begin
+    //     branch_rs2_fwd = '1;
+    //     branch_rs2_fwd_data = lsu_wb_data;
+    // end
     else begin
         branch_rs2_fwd = '0;
         branch_rs2_fwd_data = '0;
