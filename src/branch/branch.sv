@@ -14,6 +14,10 @@ module branch
     // data coming back from reg file
     input   logic [31:0]    rs1_data,
     input   logic [31:0]    rs2_data,
+
+    // ex stage PC output
+    output  logic [31:0]    ex_pc_out,
+
     // destination reg addr, data, write en
     output  logic [4:0]     rd_out,
     output  logic [31:0]    ret_addr,
@@ -21,6 +25,8 @@ module branch
     // branch taken outcome (need so we can squash previous cycle)
     output  logic           branch_taken,
     output  logic [31:0]    new_pc,
+    output  logic           dont_squash_dec_out,
+    output  logic           dont_squash_exec_out,
 
     // forwarding inputs
     input   logic           is_rs1_fwd,
@@ -33,7 +39,11 @@ module branch
     output  logic [4:0]     dc_rs2,
 
     // squash from PC after branch taken
-    input   logic           branch_squash
+    input   logic           branch_squash,
+    input   logic           dont_squash_dec_in,
+
+    // halt signal to go to PC
+    output  logic           halt_proc
 );
 
 // internal signals coming out of decode
@@ -73,7 +83,8 @@ logic [19:0]    idex_imm;
 logic [31:0]    idex_pc;
 // internal signal to or the decode is_nop with squash
 logic           decode_nop_or_squash;
-assign decode_nop_or_squash = decode_is_nop || branch_squash;
+assign decode_nop_or_squash = decode_is_nop || (branch_squash && ~dont_squash_dec_in);
+assign ex_pc_out = idex_pc;
 
 branch_id_ex idex (
     .clk(clk),
@@ -116,9 +127,12 @@ branch_execute exec (
     .rs2_data(rs2_data),
     .imm(idex_imm),
     .branch_taken(branch_taken),
+    .dont_squash_dec(dont_squash_dec_out),
+    .dont_squash_exec(dont_squash_exec_out),
     .new_pc(new_pc),
     .ret_addr(ret_addr),
-    .rd_wr_en(reg_file_wr_en)
+    .rd_wr_en(reg_file_wr_en),
+    .halt_proc(halt_proc)
 );
 
 endmodule

@@ -68,6 +68,7 @@ logic           lsu_rd_zero_ext;
 //// instruction fetch to/from memory signals ////
 logic [127:0]   instr_bundle;
 logic [31:0]    fetch_pc;
+logic [31:0]    ex_pc;
 
 //// fetch to pipeline signals ////
 logic [31:0]    ixu1_inst;
@@ -77,6 +78,9 @@ logic [31:0]    bru_inst;
 
 //// program counter to fetch signals ////
 logic [31:0]    pc_data_out;
+
+//// address to stop execution if it's hit ////
+logic [31:0]    data_start_addr;
 
 
 //// forwarding signals ////
@@ -130,6 +134,29 @@ logic [4:0]     bru_dc_rs2;
 
 logic           haz_det_stall;
 
+// squash signals
+logic           bru_dont_squash_dec;
+logic           bru_dont_squash_exec;
+logic           pc_dont_squash_dec;
+logic           pc_dont_squash_exec;
+
+// halt register (switched by ecall/ebreak writeback)
+logic           halt_proc;
+// wires from branch -> pc and pc -> halt reg
+logic           pc_halt_in;
+logic           pc_halt_out;
+
+always_ff @ (negedge clk) begin
+    halt_proc <= pc_halt_out;
+end
+
+always_comb begin
+    if (halt_proc) begin
+        $display("ECALL or EBREAK hit, ending simulation");
+        $stop;
+    end
+end
+
 //// module instances ////
 // IXU 1
 ixu ixu_1
@@ -142,6 +169,7 @@ ixu ixu_1
     .rs2_out(ixu1_rs2_out),
     .rs1_data(ixu1_rs1_data),
     .rs2_data(ixu1_rs2_data),
+    .ex_pc_in(ex_pc),
     .rd_out(ixu1_rd_out),
     .wb_rd_out(ixu1_wb_rd),
     .data_out(ixu1_data_out),
@@ -153,7 +181,9 @@ ixu ixu_1
     .dc_rs1(ixu1_dc_rs1),
     .dc_rs2(ixu1_dc_rs2),
     .wb_nop(ixu1_wb_nop),
-    .branch_squash(pc_squash_out)
+    .branch_squash(pc_squash_out),
+    .dont_squash_dec(pc_dont_squash_dec),
+    .dont_squash_exec(pc_dont_squash_exec)
 );
 
 // IXU 2
@@ -167,6 +197,7 @@ ixu ixu_2
     .rs2_out(ixu2_rs2_out),
     .rs1_data(ixu2_rs1_data),
     .rs2_data(ixu2_rs2_data),
+    .ex_pc_in(ex_pc),
     .rd_out(ixu2_rd_out),
     .wb_rd_out(ixu2_wb_rd),
     .data_out(ixu2_data_out),
@@ -178,7 +209,9 @@ ixu ixu_2
     .dc_rs1(ixu2_dc_rs1),
     .dc_rs2(ixu2_dc_rs2),
     .wb_nop(ixu2_wb_nop),
-    .branch_squash(pc_squash_out)
+    .branch_squash(pc_squash_out),
+    .dont_squash_dec(pc_dont_squash_dec),
+    .dont_squash_exec(pc_dont_squash_exec)
 );
 
 // LSU
@@ -222,7 +255,9 @@ lsu lsu_i
     .dc_rs1(lsu_dc_rs1),
     .dc_rs2(lsu_dc_rs2),
     .wb_nop(lsu_wb_nop),
-    .branch_squash(pc_squash_out)
+    .branch_squash(pc_squash_out),
+    .dont_squash_dec(pc_dont_squash_dec),
+    .dont_squash_exec(pc_dont_squash_exec)
 );
 
 // BRANCH
@@ -237,10 +272,13 @@ branch bru
     .rs2_out(bru_rs2_out),
     .rs1_data(bru_rs1_data),
     .rs2_data(bru_rs2_data),
+    .ex_pc_out(ex_pc),
     .rd_out(bru_rd_out),
     .ret_addr(bru_ret_addr),
     .reg_file_wr_en(bru_reg_file_wr_en),
     .branch_taken(bru_branch_taken_out),
+    .dont_squash_dec_out(bru_dont_squash_dec),
+    .dont_squash_exec_out(bru_dont_squash_exec),
     .new_pc(bru_new_pc_out),
     .is_rs1_fwd(bru_is_rs1_fwd),
     .is_rs2_fwd(bru_is_rs2_fwd),
@@ -248,7 +286,9 @@ branch bru
     .rs2_fwd_data(bru_rs2_fwd_data),
     .dc_rs1(bru_dc_rs1),
     .dc_rs2(bru_dc_rs2),
-    .branch_squash(pc_squash_out)
+    .branch_squash(pc_squash_out),
+    .dont_squash_dec_in(pc_dont_squash_dec),
+    .halt_proc(pc_halt_in)
 );
 
 // reg file
@@ -313,6 +353,7 @@ main_memory #(
     .data_out(lsu_rd_data),
     // instruction fetch ports
     .pc_in(fetch_pc),
+    .data_start_addr(data_start_addr),
     .inst_bundle_out(instr_bundle)
 );
 
@@ -341,9 +382,16 @@ program_counter pc
     .rst(rst),
     .stall(haz_det_stall),
     .branch_taken(bru_branch_taken_out),
+    .dont_squash_dec_in(bru_dont_squash_dec),
+    .dont_squash_exec_in(bru_dont_squash_exec),
     .new_pc(bru_new_pc_out),
+    .data_start_addr(data_start_addr),
+    .halt_in(pc_halt_in),
     .pc(pc_data_out),
-    .squash(pc_squash_out)
+    .squash(pc_squash_out),
+    .dont_squash_dec_out(pc_dont_squash_dec),
+    .dont_squash_exec_out(pc_dont_squash_exec),
+    .halt_out(pc_halt_out)
 );
 
 // forwarding unit

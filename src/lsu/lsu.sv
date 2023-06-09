@@ -51,7 +51,9 @@ module lsu
     output  logic           wb_nop,
 
     // squash from PC after branch taken
-    input   logic           branch_squash
+    input   logic           branch_squash,
+    input   logic           dont_squash_dec,
+    input   logic           dont_squash_exec
 );
 
 // Decode -> ID/EX reg signals
@@ -79,10 +81,10 @@ logic [11:0]    idex_imm;
 
 // internal signal to or the decode is_nop with squash
 logic           decode_nop_or_squash;
-assign decode_nop_or_squash = decode_is_nop || branch_squash;
+assign decode_nop_or_squash = decode_is_nop || (branch_squash && ~dont_squash_dec);
 // internal signal to or the execute is_nop with squash
 logic           exec_nop_or_squash;
-assign exec_nop_or_squash = idex_is_nop || branch_squash;
+assign exec_nop_or_squash = idex_is_nop || (branch_squash && ~dont_squash_exec);
 
 lsu_decode decode (
     .inst(inst),

@@ -3,13 +3,22 @@
 # Note that it does not check for architecture-compliant assembly, it's just a parser
 
 # IMPORTANT: run this from the test directory! (for correct file referencing)
-# This parser uses spaces to split
+
+# python3 asm_to_hex.py asm/<your_asm_file>.asm
+
+# Output .hex files are stored in the test/hex
+
+# This parser uses spaces to split, and strips commas
 # Thus, all instructions should have format: 
-# R-type: inst rd rs1 rs2
-# I-type: inst rd rs1 imm
-# S-type: inst rs2 rs1 offset
-# B-type: inst rs1 rs2 offset
-# J-type: inst rd offset
+# R-type: inst rd, rs1, rs2
+# I-type: inst rd, rs1, imm
+# S-type: inst rs2, rs1, offset
+# B-type: inst rs1, rs2, offset
+# J-type: inst rd, offset
+
+# offsets and data can be either decimal or in hex, prefixed with '0x'
+# For examples of compatible assembly, see the test/asm folder
+
 import sys
 
 def int_to_bin(value, bit_width):
@@ -499,6 +508,42 @@ def parse(line):
         assert len(bits) == 32
         return bin_to_hex(bits)
     
+    elif inst_str == 'lui':
+        opcode = '0110111'
+        rd = int_to_bin(int(line_arr[1]), 5)
+        if is_hex[2]:
+            imm = hex_to_bin(line_arr[2], 20)
+        else:
+            imm = int_to_bin(int(line_arr[2]), 20)
+        bits = imm + rd + opcode
+        assert len(bits) == 32
+        return bin_to_hex(bits)
+
+    elif inst_str == 'auipc':
+        opcode = '0010111'
+        rd = int_to_bin(int(line_arr[1]), 5)
+        if is_hex[2]:
+            imm = hex_to_bin(line_arr[2], 20)
+        else:
+            imm = int_to_bin(int(line_arr[2]), 20)
+        bits = imm + rd + opcode
+        assert len(bits) == 32
+        return bin_to_hex(bits)
+    
+    elif inst_str == 'ecall':
+        imm = '0000000000000000000000000'
+        opcode = '1110011'
+        bits = imm + opcode
+        assert len(bits) == 32
+        return bin_to_hex(bits)
+    
+    elif inst_str == 'ebreak':
+        imm = '0000000000010000000000000'
+        opcode = '1110011'
+        bits = imm + opcode
+        assert len(bits) == 32
+        return bin_to_hex(bits)
+    
     else:
         raise ValueError("Could not determine the instruction: " + inst_str)
 
@@ -509,7 +554,7 @@ def main():
     # hex output file
     hex_file_name = sys.argv[1].split('.')[0].split('/')[1]
     # print(hex_file_name)
-    hex_file = open('bin/' + hex_file_name + '.hex', 'w')
+    hex_file = open('hex/' + hex_file_name + '.hex', 'w')
 
     hex_file.write(format(0, '08x') + ' / ' + format(0, '08x') + ';\n')
     mem_addr = 4
@@ -520,6 +565,7 @@ def main():
         if line == '\n':
             continue
         elif line == '.DATA\n':
+            hex_file.write('\n.DATA\n');
             data_section_entered = True
             continue
 

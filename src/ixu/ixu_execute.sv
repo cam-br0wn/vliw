@@ -8,10 +8,11 @@ module ixu_execute
     input   logic [31:0]    rs2_fwd_data,
     input   logic [31:0]    rs1_data,
     input   logic [31:0]    rs2_data,
-    input   logic [11:0]    imm,
+    input   logic [19:0]    imm,
     input   logic           is_imm_type,
     input   logic           is_nop,
     input   logic [3:0]     op,
+    input   logic [31:0]    ex_pc_in,
     output  logic [31:0]    out
 );
 
@@ -29,7 +30,7 @@ logic [31:0] X;
 logic [31:0] Y;
 
 assign X = internal_rs1_data;
-assign Y = (is_imm_type) ? {{20{imm[11]}}, imm} : internal_rs2_data;
+assign Y = (is_imm_type) ? {{12{imm[11]}}, imm} : internal_rs2_data;
 
 always_comb begin
     // NOP
@@ -65,8 +66,17 @@ always_comb begin
     // SLTU or SLTUI
     end else if ( op == 4'h9 ) begin
         out = ($unsigned(X) < $unsigned(Y)) ? 32'h1 : 32'h0;
+    end 
+    // LUI
+    else if ( op == 4'hA ) begin
+        out = imm << 12;
+    end
+    // AUIPC
+    else if ( op == 4'hB ) begin
+        out = $signed(ex_pc_in) + $signed(imm << 12);
+    end
     // otherwise invalid opcode
-    end else begin
+    else begin
         $error("IXU ALU ERROR: invalid op bits in ALU");
         out = 32'hDEADBEEF;
     end

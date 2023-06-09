@@ -1,4 +1,4 @@
-nop
+addi x1 x0 0xf
 addi x2 x0 0x70
 nop
 nop
@@ -13,7 +13,7 @@ sub x7 x5 x0
 nop
 beq x5 x5 32
 
-addi x1 x0 0xf
+add x1 x1 x1
 nop
 nop
 nop
@@ -21,7 +21,7 @@ nop
 addi x1 x0 10
 nop
 nop
-nop
+ecall
 
 .DATA
 

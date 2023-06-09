@@ -12,6 +12,10 @@ module ixu
     // data coming back from reg file
     input   logic [31:0]    rs1_data,
     input   logic [31:0]    rs2_data,
+
+    // ex stage PC for AUIPC
+    input   logic [31:0]    ex_pc_in,
+    
     // destination register addr, data, write enable
     output  logic [4:0]     rd_out,
     output  logic [31:0]    data_out,
@@ -32,7 +36,9 @@ module ixu
     output  logic           wb_nop,
 
     // squash from PC after branch taken
-    input   logic           branch_squash
+    input   logic           branch_squash,
+    input   logic           dont_squash_dec,
+    input   logic           dont_squash_exec
 );
 
 // Decode -> ID/EX register internal signals
@@ -42,7 +48,7 @@ logic           decode_is_imm_type;
 logic [4:0]     decode_rs1;
 logic [4:0]     decode_rs2;
 logic [4:0]     decode_rd;
-logic [11:0]    decode_imm;
+logic [19:0]    decode_imm;
 
 assign dc_rs1 = decode_rs1;
 assign dc_rs2 = decode_rs2;
@@ -63,10 +69,10 @@ logic [3:0]     idex_op;
 logic           idex_is_nop;
 logic           idex_is_imm_type;
 logic [4:0]     idex_rd;
-logic [11:0]    idex_imm;
+logic [19:0]    idex_imm;
 // internal signal to or the decode is_nop with squash
 logic           decode_nop_or_squash;
-assign decode_nop_or_squash = decode_is_nop || branch_squash;
+assign decode_nop_or_squash = decode_is_nop || (branch_squash && ~dont_squash_dec);
 
 ixu_id_ex idex (
     .clk(clk),
@@ -98,6 +104,7 @@ ixu_execute exec (
     .rs2_fwd_data(rs2_fwd_data),
     .rs1_data(rs1_data),
     .rs2_data(rs2_data),
+    .ex_pc_in(ex_pc_in),
     .imm(idex_imm),
     .is_imm_type(idex_is_imm_type),
     .is_nop(idex_is_nop),
@@ -111,7 +118,7 @@ logic [4:0]     exwb_rd;
 logic [31:0]    exwb_data;
 // internal signal to or the execute is_nop with squash
 logic           exec_nop_or_squash;
-assign exec_nop_or_squash = idex_is_nop || branch_squash;
+assign exec_nop_or_squash = idex_is_nop || (branch_squash && ~dont_squash_exec);
 
 ixu_ex_wb exwb (
     .clk(clk),

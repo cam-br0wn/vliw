@@ -10,14 +10,14 @@ module ixu_id_ex
     input   logic [4:0]     rs1_in,
     input   logic [4:0]     rs2_in,
     input   logic [4:0]     rd_in,
-    input   logic [11:0]    imm_in,
+    input   logic [19:0]    imm_in,
     output  logic [3:0]     op_out,
     output  logic           is_nop_out,
     output  logic           is_imm_type_out,
     output  logic [4:0]     rs1_out,
     output  logic [4:0]     rs2_out,
     output  logic [4:0]     rd_out,
-    output  logic [11:0]    imm_out
+    output  logic [19:0]    imm_out
 );
 
 always_ff @(posedge clk or posedge rst) begin

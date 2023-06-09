@@ -7,7 +7,7 @@ module ixu_decode
     output  logic [4:0]     rs1,
     output  logic [4:0]     rs2,
     output  logic [4:0]     rd,
-    output  logic [11:0]    imm
+    output  logic [19:0]    imm
 );
 
 // internal signals
@@ -16,14 +16,14 @@ logic [2:0] funct3;
 logic [6:0] funct7;
 
 assign opcode = inst[6:0];
-assign funct3 = inst[14:12];
-assign rs1 = inst[19:15];
 assign rd = inst[11:7];
 
 // drive an output signal to be used on a mux between reg file and pipeline reg
 always_comb begin
     // R-type instruction
     if (opcode == 7'b0110011) begin
+        funct3 = inst[14:12];
+        rs1 = inst[19:15];
         funct7 = inst[31:25];
         rs2 = inst[24:20];
         imm = '0;
@@ -81,9 +81,11 @@ always_comb begin
     end
     // I-type instruction
     else if (opcode == 7'b0010011) begin
+        funct3 = inst[14:12];
+        rs1 = inst[19:15];
         funct7 = '0;
         rs2 = '0;
-        imm = inst[31:20];
+        imm = {{8{inst[31]}}, inst[31:20]};
         is_imm_type = '1;
         is_nop = '0;
         // addi
@@ -129,8 +131,27 @@ always_comb begin
             $error("IXU DECODE ERROR: could not decode IXU imm instr");
         end
     end
+    // U-type
+    else if ((opcode == 7'b0110111) || (opcode == 7'b0010111)) begin
+        // LUI
+        if (opcode == 7'b0110111) begin
+            op = 4'hA;
+        end
+        // AUIPC
+        if (opcode == 7'b0010111) begin
+            op = 4'hB;
+        end
+        funct7 = '0;
+        rs2 = '0;
+        imm = inst[31:12];
+        is_imm_type = '1;
+        is_nop = '0;
+    end
     // NOP
     else if (inst == 32'h00000000) begin
+        funct3 = '0;
+        op = '0;
+        rs1 = '0;
         funct7 = '0;
         rs2 = '0;
         imm = '0;

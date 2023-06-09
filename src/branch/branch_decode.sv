@@ -70,6 +70,19 @@ always_comb begin
         is_nop = '0;
         op = '0;
     end
+    // ecall or ebreak
+    else if (opcode == 7'b1110011) begin
+        funct3 = '0;
+        zero_ext = '0;
+        rs1 = '0;
+        rs2 = '0;
+        rd = '0;
+        imm = {{9{inst[31]}}, inst[30:20]};
+        is_jmp = '1;
+        is_imm_type = '0;
+        is_nop = '0;
+        op = 2'h1;
+    end
     // NOP
     else if (inst == '0) begin
         funct3 = '0;

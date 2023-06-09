@@ -16,6 +16,7 @@ module main_memory #(
     output  logic [31:0]  data_out,
     // ports for inst fetch
     input   logic [31:0]  pc_in,
+    output  logic [31:0]  data_start_addr,
     output  logic [127:0] inst_bundle_out
 );
 
@@ -25,6 +26,7 @@ integer ram_size = 0;
 
 integer char;
 integer r;
+integer d;
 integer c = 0;
 integer i = 0;
 integer initNeeded = 1;
@@ -32,6 +34,8 @@ integer check_sram = 0;
 integer addr_found = 1;
 
 logic [3:0] slash;
+logic [19:0] data_str;
+logic [31:0] data_start;
 logic [31:0] addr_value;
 logic [31:0] data_value;
 logic [8*100:1] line;
@@ -43,6 +47,7 @@ logic [31:0] internal_rd_addr;
 
 assign internal_wr_addr = $signed(wr_addr) >>> 2;
 assign internal_rd_addr = $signed(rd_addr) >>> 2;
+assign data_start_addr = data_start;
 
 // Define the memory array
 logic [31:0] mem [0:NUM_WORDS-1][0:1];
@@ -212,23 +217,28 @@ task initialize;
     end
     char = $fgetc(file);
     c = 0;
+    data_start = '0;
     while (char != -1) begin
         line = "";
         slash = "";
         addr_value = 32'h0;
         data_value = 32'h0;
-
+    
         r = $ungetc(char, file);
         r = $fgets(line, file);
 
         r = $sscanf(line, "%h %s %h", addr_value, slash, data_value);
+        d = $sscanf(line, "%s", data_str);
         if (r == 3) begin
             mem[c][0] = addr_value;
             mem[c][1] = data_value;
-            $display("Addr is written %h", mem[c][0]);
-            $display("Data is written %h", mem[c][1]);
+            $display("Wrote: %h : %h", mem[c][0], mem[c][1]);
             c = c + 1;
             ram_size = ram_size + 1;
+        end
+        else if (d == 1) begin
+            data_start = mem[c-1][0] + 4;
+            $display("Located DATA memory start at: %08x", (mem[c-1][0] + 4));
         end
         else if ((r == 2) || (r == 1)) begin
             $display("ERROR: Data %h is not in hex format: ", data_value);

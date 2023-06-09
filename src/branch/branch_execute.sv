@@ -16,9 +16,12 @@ module branch_execute
     input   logic [31:0]    rs2_data,
     input   logic [19:0]    imm,
     output  logic           branch_taken,
+    output  logic           dont_squash_dec,
+    output  logic           dont_squash_exec,
     output  logic [31:0]    new_pc,
     output  logic [31:0]    ret_addr,
-    output  logic           rd_wr_en
+    output  logic           rd_wr_en,
+    output  logic           halt_proc
 );
 
 logic [31:0] internal_imm;
@@ -35,7 +38,10 @@ always_comb begin
         if (is_jmp == '0) begin
             ret_addr = '0;
             rd_wr_en = '0;
+            halt_proc = '0;
             internal_imm = {{16{imm[11]}}, imm[11:0], 4'h0};
+            dont_squash_dec = ((internal_imm >= 32'd16) && (internal_imm < 32'd32));
+            dont_squash_exec = ((internal_imm >= 32'd32) && (internal_imm < 32'd48));
             // BEQ
             if (op == 2'h0) begin
                 branch_taken = (internal_rs1_data == internal_rs2_data);
@@ -74,26 +80,46 @@ always_comb begin
         // JAL or JALR
         end else if (is_jmp == '1) begin
             branch_taken = '1;
-            ret_addr = $signed(pc) + $signed(32'd16);
-            rd_wr_en = '1;
-            // JALR
-            if (is_imm_type) begin
+            // JAL or JALR
+            if (op == 2'h0) begin
+                ret_addr = $signed(pc) + $signed(32'd16);
+                rd_wr_en = '1;
+                halt_proc = '0;
+                // JALR
+                if (is_imm_type) begin
+                    internal_imm = {{20{imm[11]}}, imm[11:0]};
+                    dont_squash_dec = ((internal_imm >= 32'd16) && (internal_imm < 32'd32));
+                    dont_squash_exec = ((internal_imm >= 32'd32) && (internal_imm < 32'd48));
+                    new_pc = {{$signed(internal_rs1_data) + $signed(internal_imm)}[31:4], 4'h0} + 4;
+                end
+                // JAL
+                else begin
+                    internal_imm = {{8{imm[19]}}, imm, 4'h0};
+                    dont_squash_dec = ((internal_imm >= 32'd16) && (internal_imm < 32'd32));
+                    dont_squash_exec = ((internal_imm >= 32'd32) && (internal_imm < 32'd48));
+                    new_pc = $signed(pc) + $signed(internal_imm);
+                end
+            end
+            // ecall or ebreak
+            else if (op == 2'h1) begin
+                ret_addr = '0;
+                rd_wr_en = '0;
+                halt_proc = '1;
                 internal_imm = {{20{imm[11]}}, imm[11:0]};
-                new_pc = {{$signed(internal_rs1_data) + $signed(internal_imm)}[31:4], 4'h0} + 4;
+                dont_squash_dec = '0;
+                dont_squash_exec = '0;
+                new_pc = pc;
             end
-            // JAL
-            else begin
-                internal_imm = {{8{imm[19]}}, imm, 4'h0};
-                new_pc = $signed(pc) + $signed(internal_imm);
-            end
-
         // INVALID
         end else begin
-            $error("BRANCH EXEC ERROR: could not determine if br, jal or jalr");
+            $error("BRANCH EXEC ERROR: could not determine if br, jal, jalr, ecall or ebreak");
         end
     end else if (is_nop == '1) begin
         internal_imm = '0;
+        dont_squash_dec = '0;
+        dont_squash_exec = '0;
         branch_taken = '0;
+        halt_proc = '0;
         ret_addr = '0;
         rd_wr_en = '0;
         new_pc = '0;
