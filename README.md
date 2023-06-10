@@ -22,7 +22,7 @@ This is a very rudimentary (and in-progress) implementation of a VLIW RISC-V arc
 
 ### Completed & To-do
 - All integer operations working ✅
-- Byte-addressing working ✅
+- Memory operations working ✅
 - Data-forwarding working ✅
 - Branching nearly working...
 
