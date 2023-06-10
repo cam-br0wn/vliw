@@ -4,7 +4,7 @@ module vliw_tb;
 
 logic clk;
 logic rst;
-parameter test_file = "test/hex/test_stall.hex";
+parameter test_file = "test/hex/test_branching.hex";
 
 vliw #(test_file)
 dut (
